@@ -21,7 +21,3 @@ class CategoryResponse(CategoryBase):
     id: UUID
 
     model_config = ConfigDict(from_attributes=True)
-
-
-class CategoryDetailResponse(CategoryResponse):
-    solutions: list["SolutionResponse"] = Field(default_factory=list)

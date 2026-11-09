@@ -5,7 +5,7 @@ from pydantic import BaseModel, ConfigDict
 
 class SolutionCategoryAssociationBase(BaseModel):
     solution_id: UUID
-    category_id: int
+    category_id: UUID
 
 
 class SolutionCategoryAssociationCreate(SolutionCategoryAssociationBase):

@@ -3,6 +3,7 @@ import uuid
 
 from sqlalchemy import DateTime, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.ext.associationproxy import association_proxy
 
 from app.core.database import Base
 
@@ -27,10 +28,15 @@ class Category(Base):
         nullable=True,
     )
 
-    solutions = relationship(
-        "Solution",
-        secondary="solution_category_associations",
-        back_populates="categories",
+    solution_associations = relationship(
+        "SolutionCategoryAssociation",
+        back_populates="category",
+        cascade="all, delete-orphan",
+    )
+
+    solutions = association_proxy(
+        "solution_associations",
+        "solution",
     )
 
     created_at: Mapped[datetime] = mapped_column(

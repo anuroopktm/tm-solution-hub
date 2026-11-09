@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.endpoints import auth, users
 from app.endpoints import solutions
+from app.endpoints import categories
 
 app = FastAPI(title="TM Solution Hub API")
 
@@ -40,6 +41,12 @@ api_router.include_router(
     solutions.router,
     prefix="/solutions",
     tags=["Solutions"],
+)
+
+api_router.include_router(
+    categories.router,
+    prefix="/categories",
+    tags=["Categories"],
 )
 
 app.include_router(api_router)

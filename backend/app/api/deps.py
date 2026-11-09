@@ -7,11 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.models.user import User
-from app.core.config import (
-    ADMIN_EMAIL,
-    JWT_SECRET_KEY,
-    JWT_ALGORITHM,
-)
+from app.core.config import settings
 
 bearer_scheme = HTTPBearer()
 
@@ -23,7 +19,9 @@ def get_current_user(
     token = credentials.credentials
 
     try:
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+        payload = jwt.decode(
+            token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
+        )
 
         subject = payload.get("sub")
 
@@ -59,7 +57,7 @@ def get_current_user(
 def get_current_admin(
     current_user: User = Depends(get_current_user),
 ) -> User:
-    if current_user.email.lower() != ADMIN_EMAIL:
+    if current_user.email.lower() != settings.ADMIN_EMAIL:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required"
         )

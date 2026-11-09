@@ -1,14 +1,22 @@
-import os
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from dotenv import load_dotenv
 
-load_dotenv()
+class Settings(BaseSettings):
+    DATABASE_URL: str
+    ADMIN_EMAIL: str
 
-DATABASE_URL = os.environ["DATABASE_URL"]
+    JWT_SECRET_KEY: str
+    JWT_ALGORITHM: str = "HS256"
 
-ADMIN_EMAIL = os.environ["ADMIN_EMAIL"].strip().lower()
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
-JWT_SECRET_KEY = os.environ["JWT_SECRET_KEY"]
-JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=True,
+        extra="ignore",
+    )
 
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+
+settings = Settings()  # pyright: ignore[reportCallIssue]

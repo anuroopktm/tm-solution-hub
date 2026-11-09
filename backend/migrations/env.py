@@ -1,25 +1,21 @@
 from logging.config import fileConfig
 
+from alembic import context
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
+from app.core.config import settings
 from app.core.database import Base
-from app.models.user import User
-
-import os
-from dotenv import load_dotenv
-
-from alembic import context
+from app import models  # pyright: ignore[reportUnusedImport]
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
-load_dotenv()
 
 config.set_main_option(
     "sqlalchemy.url",
-    os.getenv("DATABASE_URL").replace("%", "%%"),
+    settings.DATABASE_URL.replace("%", "%%"),
 )
 
 # Interpret the config file for Python logging.
