@@ -9,6 +9,7 @@ from app.schemas.base import BaseResponse
 from app.schemas.solution import (
     SolutionCreate,
     SolutionDetailResponse,
+    SolutionListItemResponse,
     SolutionResponse,
     SolutionUpdate,
 )
@@ -19,12 +20,13 @@ router = APIRouter()
 
 @router.get(
     "/",
-    response_model=list[SolutionResponse],
+    response_model=list[SolutionListItemResponse],
 )
 def get_solutions(
+    category_id: UUID | None = None,
     db: Session = Depends(get_db),
 ):
-    return solution_service.get_solutions(db)
+    return solution_service.get_solutions_list(db, category_id=category_id)
 
 
 @router.get("/recent", response_model=BaseResponse[list[SolutionResponse]])
@@ -59,14 +61,6 @@ def get_solution(solution_id: UUID, db: Session = Depends(get_db)):
     status_code=status.HTTP_201_CREATED,
 )
 def create_solution(payload: SolutionCreate, db: Session = Depends(get_db)):
-    # Check unique code
-    existing_code = solution_service.get_solution_by_code(db, payload.code)
-    if existing_code:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"Solution with code '{payload.code}' already exists",
-        )
-
     # Validate lead_id if provided
     if payload.lead_id:
         lead_user = db.query(User).filter(User.id == payload.lead_id).first()
@@ -101,16 +95,6 @@ def update_solution(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Solution not found",
         )
-
-    if payload.code:
-        existing_code = solution_service.get_solution_by_code(
-            db, payload.code, exclude_id=solution_id
-        )
-        if existing_code:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=f"Solution with code '{payload.code}' already exists",
-            )
 
     if payload.lead_id:
         lead_user = db.query(User).filter(User.id == payload.lead_id).first()

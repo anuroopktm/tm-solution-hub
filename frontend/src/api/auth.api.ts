@@ -1,6 +1,14 @@
 import { apiClient } from "@/api/axios";
 
-import type { LoginRequest, LoginResponse, User } from "../types/auth.types";
+import type {
+  LoginRequest,
+  LoginResponse,
+  LogoutRequest,
+  LogoutResponse,
+  RefreshTokenRequest,
+  RefreshTokenResponse,
+  User,
+} from "../types/auth.types";
 
 export const authApi = {
   login: async (payload: LoginRequest): Promise<LoginResponse> => {
@@ -18,7 +26,23 @@ export const authApi = {
     return data;
   },
 
-  logout: async (): Promise<void> => {
-    await apiClient.post("/auth/logout");
+  refreshToken: async (
+    payload: RefreshTokenRequest,
+  ): Promise<RefreshTokenResponse> => {
+    const { data } = await apiClient.post<RefreshTokenResponse>(
+      "/auth/refresh",
+      payload,
+    );
+
+    return data;
+  },
+
+  logout: async (payload: LogoutRequest): Promise<LogoutResponse> => {
+    const { data } = await apiClient.post<LogoutResponse>(
+      "/auth/logout",
+      payload,
+    );
+
+    return data;
   },
 };

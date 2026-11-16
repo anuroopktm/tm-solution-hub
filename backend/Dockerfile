@@ -15,5 +15,6 @@ RUN uv sync --frozen
 COPY . .
 
 EXPOSE 8000
+EXPOSE 8001
 
 CMD ["/bin/sh", "/app/prestart.sh"]

@@ -1,5 +1,5 @@
 services:
-  backend:
+  fastapi-backend:
     build:
       context: .
       dockerfile: Dockerfile
@@ -8,13 +8,35 @@ services:
       - "8000:8000"
     env_file:
       - .env
+    environment:
+      - MCP_SERVER_URL=http://mcp-server:8001
     volumes:
       - .:/app
       - /app/.venv
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
-  db:
+      mcp-server:
+        condition: service_started
+
+  mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mcp-server
+    command: uv run fastmcp run app/mcp/server.py --transport http --host 0.0.0.0 --port 8001 --reload
+    ports:
+      - "8001:8001"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/.venv
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
     image: postgres:17
     container_name: fastapi-postgres
     restart: unless-stopped
@@ -31,6 +53,11 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      default:
+        aliases:
+          - db
+          - postgres
 
 volumes:
   postgres_data:

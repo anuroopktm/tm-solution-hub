@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session, joinedload, selectinload
 
 from app.models.category import Category
@@ -13,13 +14,38 @@ from app.models.solution_category_association import SolutionCategoryAssociation
 from app.schemas.solution import SolutionCreate, SolutionUpdate
 
 
-def get_solutions(db: Session) -> list[Solution]:
-    return (
-        db.query(Solution)
-        .options(joinedload(Solution.lead))
-        .order_by(Solution.created_at.desc())
-        .all()
+def get_solutions_list(db: Session, category_id: UUID | None = None) -> list[Solution]:
+    stmt = db.query(Solution)
+
+    if category_id:
+        stmt = stmt.filter(
+            Solution.category_associations.any(
+                SolutionCategoryAssociation.category_id == category_id
+            )
+        )
+
+    return stmt.order_by(Solution.created_at.desc()).all()
+
+
+def get_solutions(db: Session, category_id: UUID | None = None) -> list[Solution]:
+    stmt = db.query(Solution).options(
+        joinedload(Solution.lead),
+        selectinload(Solution.category_associations).selectinload(
+            SolutionCategoryAssociation.category
+        ),
+        selectinload(Solution.documents),
+        selectinload(Solution.videos),
+        selectinload(Solution.service_urls),
     )
+
+    if category_id:
+        stmt = stmt.filter(
+            Solution.category_associations.any(
+                SolutionCategoryAssociation.category_id == category_id
+            )
+        )
+
+    return stmt.order_by(Solution.created_at.desc()).all()
 
 
 def get_recent_solutions(db: Session, limit: int = 5) -> list[Solution]:
@@ -49,15 +75,92 @@ def get_solution_by_id(db: Session, solution_id: UUID) -> Solution | None:
     )
 
 
-def get_solution_by_code(
-    db: Session, code: str, exclude_id: UUID | None = None
-) -> Solution | None:
-    query = db.query(Solution).filter(Solution.code == code)
+def get_solution_detail_by_code_or_id(db: Session, identifier: str) -> Solution | None:
+    """Fetch complete solution details with all relationships eagerly loaded,
+    accepting either a UUID string or title.
+    """
+    try:
+        val_uuid = UUID(identifier)
+        return get_solution_by_id(db, val_uuid)
+    except (ValueError, AttributeError):
+        pass
 
-    if exclude_id is not None:
-        query = query.filter(Solution.id != exclude_id)
+    return (
+        db.query(Solution)
+        .options(
+            joinedload(Solution.lead),
+            selectinload(Solution.category_associations).selectinload(
+                SolutionCategoryAssociation.category
+            ),
+            selectinload(Solution.documents),
+            selectinload(Solution.videos),
+            selectinload(Solution.service_urls),
+        )
+        .filter(Solution.title.ilike(identifier.strip()))
+        .first()
+    )
 
-    return query.first()
+
+def search_solutions(
+    db: Session,
+    query: str | None = None,
+    category: str | None = None,
+    tech_stack: list[str] | None = None,
+    limit: int = 10,
+) -> list[Solution]:
+    """Search solutions across title, description, and tech stack."""
+    stmt = db.query(Solution).options(
+        joinedload(Solution.lead),
+        selectinload(Solution.category_associations).selectinload(
+            SolutionCategoryAssociation.category
+        ),
+    )
+
+    if query:
+        search_pattern = f"%{query.strip()}%"
+        stmt = stmt.filter(
+            or_(
+                Solution.title.ilike(search_pattern),
+                Solution.description.ilike(search_pattern),
+                func.array_to_string(Solution.tech_stack, " ").ilike(search_pattern),
+            )
+        )
+
+    if category:
+        stmt = stmt.filter(
+            Solution.category_associations.any(
+                SolutionCategoryAssociation.category.has(
+                    Category.name.ilike(f"%{category.strip()}%")
+                )
+            )
+        )
+
+    if tech_stack:
+        stmt = stmt.filter(Solution.tech_stack.overlap(tech_stack))
+
+    return stmt.order_by(Solution.created_at.desc()).limit(limit).all()
+
+
+def filter_solutions_by_tech(
+    db: Session,
+    technologies: list[str],
+    match_all: bool = False,
+    limit: int = 20,
+) -> list[Solution]:
+    """Filter solutions containing specified tech stack items."""
+    stmt = db.query(Solution).options(
+        joinedload(Solution.lead),
+        selectinload(Solution.category_associations).selectinload(
+            SolutionCategoryAssociation.category
+        ),
+    )
+
+    if match_all:
+        stmt = stmt.filter(Solution.tech_stack.contains(technologies))
+    else:
+        stmt = stmt.filter(Solution.tech_stack.overlap(technologies))
+
+    return stmt.order_by(Solution.created_at.desc()).limit(limit).all()
 
 
 def create_solution(db: Session, payload: SolutionCreate) -> Solution:

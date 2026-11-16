@@ -11,6 +11,16 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
+    LLM_PROVIDER: str = "groq"
+
+    GROQ_API_KEY: str | None = None
+    GROQ_MODEL: str | None = None
+
+    OPENAI_API_KEY: str | None = None
+    OPENAI_MODEL: str | None = None
+
+    MCP_SERVER_URL: str | None = None
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

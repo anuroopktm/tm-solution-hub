@@ -1,17 +1,27 @@
 from uuid import UUID
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.models.category import Category
 from app.schemas.category import CategoryCreate, CategoryUpdate
 
 
 def get_categories(db: Session) -> list[Category]:
-    return db.query(Category).order_by(Category.name.asc()).all()
+    return (
+        db.query(Category)
+        .options(selectinload(Category.solution_associations))
+        .order_by(Category.name.asc())
+        .all()
+    )
 
 
 def get_category_by_id(db: Session, category_id: UUID) -> Category | None:
-    return db.query(Category).filter(Category.id == category_id).first()
+    return (
+        db.query(Category)
+        .options(selectinload(Category.solution_associations))
+        .filter(Category.id == category_id)
+        .first()
+    )
 
 
 def get_category_by_name(

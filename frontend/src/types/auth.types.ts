@@ -3,22 +3,31 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface LoginResponse {
+export interface TokenResponse {
   access_token: string;
+  refresh_token: string;
   token_type: string;
+}
+
+export type LoginResponse = TokenResponse;
+
+export interface RefreshTokenRequest {
+  refresh_token: string;
+}
+
+export type RefreshTokenResponse = TokenResponse;
+
+export interface LogoutRequest {
+  refresh_token: string;
+}
+
+export interface LogoutResponse {
+  detail: string;
 }
 
 export interface User {
   id: string;
-  email: string;
   username: string;
-  first_name: string;
-  last_name: string;
-  is_active: boolean;
-  is_superuser: boolean;
-}
-
-export interface AuthState {
-  user: User | null;
-  isAuthenticated: boolean;
+  email: string;
+  is_deleted: boolean;
 }

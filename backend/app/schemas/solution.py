@@ -4,7 +4,6 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.models.solution import SolutionStatus
 from app.schemas.category import CategoryResponse
 from app.schemas.user import UserResponse
 
@@ -67,12 +66,10 @@ class SolutionServiceUrlResponse(SolutionServiceUrlBase):
 
 # --- Solution Schemas ---
 class SolutionBase(BaseModel):
-    code: str = Field(..., min_length=1, max_length=50)
     title: str = Field(..., min_length=1, max_length=150)
-    tagline: str | None = Field(default=None, max_length=250)
     description: str | None = None
-    status: SolutionStatus = SolutionStatus.DEVELOPMENT
-    version: str | None = Field(default=None, max_length=50)
+    thumbnail_url: str | None = Field(default=None, max_length=1000)
+    preview_url: str | None = Field(default=None, max_length=1000)
     repository_url: str | None = Field(default=None, max_length=500)
     tech_stack: list[str] = Field(default_factory=list[str])
     key_capabilities: list[dict[str, Any]] | None = None
@@ -91,12 +88,10 @@ class SolutionCreate(SolutionBase):
 
 
 class SolutionUpdate(BaseModel):
-    code: str | None = Field(default=None, min_length=1, max_length=50)
     title: str | None = Field(default=None, min_length=1, max_length=150)
-    tagline: str | None = Field(default=None, max_length=250)
     description: str | None = None
-    status: SolutionStatus | None = None
-    version: str | None = Field(default=None, max_length=50)
+    thumbnail_url: str | None = Field(default=None, max_length=1000)
+    preview_url: str | None = Field(default=None, max_length=1000)
     repository_url: str | None = Field(default=None, max_length=500)
     tech_stack: list[str] | None = None
     key_capabilities: list[dict[str, Any]] | None = None
@@ -105,6 +100,18 @@ class SolutionUpdate(BaseModel):
     documents: list[SolutionDocumentCreate] | None = None
     videos: list[SolutionVideoCreate] | None = None
     service_urls: list[SolutionServiceUrlCreate] | None = None
+
+
+class SolutionListItemResponse(BaseModel):
+    id: UUID
+    title: str
+    description: str | None = None
+    thumbnail_url: str | None = None
+    preview_url: str | None = None
+    tech_stack: list[str] = Field(default_factory=list[str])
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class SolutionResponse(SolutionBase):

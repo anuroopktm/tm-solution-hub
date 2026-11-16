@@ -28,6 +28,17 @@ class Category(Base):
         nullable=True,
     )
 
+    # UI: Lucide Icon name & Cover Thumbnail
+    icon: Mapped[str | None] = mapped_column(
+        String(100),
+        nullable=True,
+    )
+
+    thumbnail_url: Mapped[str | None] = mapped_column(
+        String(1000),
+        nullable=True,
+    )
+
     solution_associations = relationship(
         "SolutionCategoryAssociation",
         back_populates="category",
@@ -38,6 +49,10 @@ class Category(Base):
         "solution_associations",
         "solution",
     )
+
+    @property
+    def solutions_count(self) -> int:
+        return len(self.solution_associations) if self.solution_associations else 0
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

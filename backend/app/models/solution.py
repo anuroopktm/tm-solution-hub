@@ -1,5 +1,4 @@
 from datetime import datetime
-import enum
 from typing import Any
 import uuid
 
@@ -11,13 +10,6 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from app.core.database import Base
 
 
-class SolutionStatus(str, enum.Enum):
-    PRODUCTION_READY = "production_ready"
-    STAGING = "staging"
-    DEVELOPMENT = "development"
-    ARCHIVED = "archived"
-
-
 class Solution(Base):
     __tablename__ = "solutions"
 
@@ -25,21 +17,13 @@ class Solution(Base):
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
 
-    # UI: Project Code (e.g. PRJ-TM-2026-08)
-    code: Mapped[str] = mapped_column(
-        String(50), unique=True, index=True, nullable=False
-    )
-
-    # UI: Title & Subtitle / Tagline
+    # UI: Title & Description
     title: Mapped[str] = mapped_column(String(150), nullable=False)
-    tagline: Mapped[str | None] = mapped_column(String(250), nullable=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    # UI: Status & Version badges
-    status: Mapped[SolutionStatus] = mapped_column(
-        String(50), default=SolutionStatus.DEVELOPMENT, nullable=False
-    )
-    version: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    # Media: Thumbnail & Hover Preview
+    thumbnail_url: Mapped[str | None] = mapped_column(String(1000), nullable=True)
+    preview_url: Mapped[str | None] = mapped_column(String(1000), nullable=True)
 
     # UI: Repository URL
     repository_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
