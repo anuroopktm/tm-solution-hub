@@ -17,7 +17,6 @@ import {
   Loader2,
   Plus,
   X,
-  ArrowLeft,
   Link2,
   Code2,
   CheckCircle2,
@@ -76,28 +75,13 @@ export function SolutionCreateForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6 pb-12">
       {/* Top Bar Navigation & Actions */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b pb-4">
-        <div className="flex items-center gap-3">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            render={<Link to="/dashboard" />}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="size-4" />
-            <span className="sr-only">Back</span>
-          </Button>
-
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">
-              Create Solution
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Publish a technical solution, architecture blueprint, or reusable
-              codebase.
-            </p>
-          </div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Create Solution</h1>
+          <p className="text-sm text-muted-foreground">
+            Publish a technical solution, architecture blueprint, or reusable
+            codebase.
+          </p>
         </div>
 
         <div className="flex items-center gap-2">

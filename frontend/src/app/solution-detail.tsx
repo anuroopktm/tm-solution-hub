@@ -148,11 +148,9 @@ export default function SolutionDetailPage() {
         {!solutionLoading && !solutionError && solution && (
           <div className="space-y-6">
             {/* Header Info */}
-            <div className="border-b border-border/60 pb-6">
-              <h1 className="text-3xl font-bold tracking-tight text-foreground">
-                {solution.title}
-              </h1>
-            </div>
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">
+              {solution.title}
+            </h1>
 
             {/* 2-Column Content Grid */}
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
