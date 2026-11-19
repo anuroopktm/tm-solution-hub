@@ -1,18 +1,25 @@
 from uuid import UUID
 
+from sqlalchemy import or_
 from sqlalchemy.orm import Session, selectinload
 
 from app.models.category import Category
 from app.schemas.category import CategoryCreate, CategoryUpdate
 
 
-def get_categories(db: Session) -> list[Category]:
-    return (
-        db.query(Category)
-        .options(selectinload(Category.solution_associations))
-        .order_by(Category.name.asc())
-        .all()
-    )
+def get_categories(db: Session, search: str | None = None) -> list[Category]:
+    query = db.query(Category).options(selectinload(Category.solution_associations))
+
+    if search and search.strip():
+        term = f"%{search.strip()}%"
+        query = query.filter(
+            or_(
+                Category.name.ilike(term),
+                Category.description.ilike(term),
+            )
+        )
+
+    return query.order_by(Category.name.asc()).all()
 
 
 def get_category_by_id(db: Session, category_id: UUID) -> Category | None:

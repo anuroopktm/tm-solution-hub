@@ -26,10 +26,21 @@ class User(Base):
         nullable=False,
     )
 
+    password_encrypted: Mapped[str | None] = mapped_column(
+        String(500),
+        nullable=True,
+    )
+
     password_hash: Mapped[str | None] = mapped_column(
         String(255),
         nullable=True,
     )
+
+    @property
+    def password(self) -> str | None:
+        from app.core.security import decrypt_password
+
+        return decrypt_password(self.password_encrypted)
 
     is_deleted: Mapped[bool] = mapped_column(
         Boolean,

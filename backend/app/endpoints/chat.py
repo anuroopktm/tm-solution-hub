@@ -1,14 +1,18 @@
+# pyright: reportMissingTypeStubs=false, reportUnknownMemberType=false
 from collections.abc import AsyncIterator
 import json
 import logging
+from typing import Any, cast
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import StreamingResponse
+from langchain_core.messages import HumanMessage
+from langchain_core.runnables.config import RunnableConfig
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
-from app.chat.orchestrator import ChatOrchestrator
+from app.chat.graph import AgentState, build_chat_graph
 from app.core.database import SessionLocal, get_db
 from app.models.user import User
 from app.schemas.conversation import ChatStreamRequest
@@ -28,6 +32,7 @@ def _format_sse(event: str, data: dict[str, object] | str) -> str:
 @router.post("/stream")
 async def chat_stream(
     payload: ChatStreamRequest,
+    request: Request,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -37,9 +42,8 @@ async def chat_stream(
     1. Authenticate user via JWT.
     2. Validate conversation ownership or create a new conversation.
     3. Persist the user message to the database immediately.
-    4. Retrieve prior conversation history.
-    5. Stream the response token-by-token and tool calls using SSE.
-    6. Persist the final assistant response to the database.
+    4. Stream the LangGraph execution token-by-token and tool calls using SSE.
+    5. Persist the final assistant response to the relational database upon completion.
     """
     conversation_id = payload.conversation_id
 
@@ -69,21 +73,7 @@ async def chat_stream(
         )
         conversation_id = conversation.id
 
-    # 2. Retrieve history prior to adding current message
-    existing_messages = (
-        conversation_service.get_conversation_messages(
-            db=db,
-            user_id=current_user.id,
-            conversation_id=conversation_id,
-        )
-        or []
-    )
-
-    history: list[dict[str, str]] = [
-        {"role": msg.role, "content": msg.content} for msg in existing_messages
-    ]
-
-    # 3. Persist user message to the database immediately
+    # 2. Persist user message to the database immediately
     user_msg = conversation_service.add_message(
         db=db,
         conversation_id=conversation_id,
@@ -94,6 +84,11 @@ async def chat_stream(
     conv_id: UUID = conversation_id
     user_msg_id: UUID = user_msg.id
     conv_title: str = conversation.title
+
+    # Retrieve compiled agent from app state or fallback
+    agent = getattr(request.app.state, "agent", None)
+    if agent is None:
+        agent = build_chat_graph()
 
     async def event_generator() -> AsyncIterator[str]:
         # Emit initial metadata event
@@ -106,56 +101,64 @@ async def chat_stream(
             },
         )
 
-        orchestrator = ChatOrchestrator()
         full_response = ""
+        config: RunnableConfig = {
+            "configurable": {
+                "thread_id": str(conv_id),
+                "user_id": str(current_user.id),
+            }
+        }
+        input_data: AgentState = {"messages": [HumanMessage(content=payload.message)]}
 
         try:
-            async for event in orchestrator.stream_chat(history, payload.message):
-                if event.type == "content":
-                    chunk_text = event.data if isinstance(event.data, str) else ""
-                    full_response += chunk_text
-                    yield _format_sse("content", {"chunk": chunk_text})
+            async for event in agent.astream_events(
+                input_data, config=config, version="v2"
+            ):
+                event_dict = cast(dict[str, Any], event)
+                kind = event_dict.get("event")
 
-                elif event.type == "tool_call":
+                # Streaming token chunks from LLM
+                if kind == "on_chat_model_stream":
+                    chunk = event_dict.get("data", {}).get("chunk")
+                    chunk_content = getattr(chunk, "content", None)
+                    if isinstance(chunk_content, str) and chunk_content:
+                        full_response += chunk_content
+                        yield _format_sse("content", {"chunk": chunk_content})
+
+                # Streaming tool call triggers
+                elif kind == "on_tool_start":
+                    tool_name = event_dict.get("name", "")
+                    tool_input = event_dict.get("data", {}).get("input")
+                    run_id = event_dict.get("run_id", "")
                     yield _format_sse(
                         "tool_call",
-                        (
-                            event.data
-                            if isinstance(event.data, dict)
-                            else {"data": event.data}
-                        ),
+                        {
+                            "tool_id": str(run_id),
+                            "name": tool_name,
+                            "arguments": tool_input,
+                        },
                     )
 
-                elif event.type == "tool_result":
+                # Streaming tool execution results
+                elif kind == "on_tool_end":
+                    tool_name = event_dict.get("name", "")
+                    tool_output = event_dict.get("data", {}).get("output")
+                    run_id = event_dict.get("run_id", "")
+                    output_content = getattr(tool_output, "content", tool_output)
                     yield _format_sse(
                         "tool_result",
-                        (
-                            event.data
-                            if isinstance(event.data, dict)
-                            else {"data": event.data}
-                        ),
+                        {
+                            "tool_id": str(run_id),
+                            "name": tool_name,
+                            "result": output_content,
+                        },
                     )
-
-                elif event.type == "error":
-                    yield _format_sse(
-                        "error",
-                        (
-                            event.data
-                            if isinstance(event.data, dict)
-                            else {"message": str(event.data)}
-                        ),
-                    )
-
-                elif event.type == "done":
-                    if isinstance(event.data, dict) and "full_response" in event.data:
-                        full_response = str(event.data["full_response"])
-                    break
 
         except Exception as exc:
-            logger.exception("Streaming error: %s", exc)
+            logger.exception("Streaming error during LangGraph execution: %s", exc)
             yield _format_sse("error", {"message": f"Stream error: {exc}"})
 
-        # 4. Persist assistant message to DB upon completion
+        # 3. Persist assistant message to DB upon completion
         if full_response.strip():
             save_db = SessionLocal()
             try:

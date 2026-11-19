@@ -24,11 +24,7 @@ export function SolutionMetadataCard({ solution }: SolutionMetadataCardProps) {
           <CardContent>
             <div className="flex flex-wrap gap-1.5">
               {solution.tech_stack.map((tech) => (
-                <Badge
-                  key={tech}
-                  variant="secondary"
-                  className="px-2.5 py-1 text-xs font-normal"
-                >
+                <Badge key={tech} variant="secondary" className="font-normal">
                   {tech}
                 </Badge>
               ))}
@@ -44,15 +40,15 @@ export function SolutionMetadataCard({ solution }: SolutionMetadataCardProps) {
             Metadata & Ownership
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4 text-xs">
+        <CardContent className="space-y-4">
           {solution.lead && (
             <div>
-              <span className="text-muted-foreground uppercase tracking-wider font-semibold text-[10px]">
+              <span className="text-muted-foreground uppercase tracking-wider font-semibold text-xs">
                 Lead Architect
               </span>
               <div className="mt-1.5 flex items-center gap-2.5">
                 <Avatar className="size-8">
-                  <AvatarFallback className="text-xs">
+                  <AvatarFallback>
                     {solution.lead.username?.slice(0, 2).toUpperCase() || "TM"}
                   </AvatarFallback>
                 </Avatar>
@@ -68,7 +64,7 @@ export function SolutionMetadataCard({ solution }: SolutionMetadataCardProps) {
 
           {solution.categories && solution.categories.length > 0 && (
             <div className="pt-2 border-t border-border/50">
-              <span className="text-muted-foreground uppercase tracking-wider font-semibold text-[10px]">
+              <span className="text-muted-foreground uppercase tracking-wider font-semibold text-xs">
                 Categories
               </span>
               <div className="mt-1.5 flex flex-wrap gap-1">
@@ -76,7 +72,7 @@ export function SolutionMetadataCard({ solution }: SolutionMetadataCardProps) {
                   <Link key={cat.id} to={`/categories/${cat.id}`}>
                     <Badge
                       variant="outline"
-                      className="hover:bg-muted text-xs cursor-pointer"
+                      className="hover:bg-muted cursor-pointer"
                     >
                       {cat.name}
                     </Badge>

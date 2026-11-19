@@ -1,18 +1,32 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
-from app.core.security import get_password_hash
+from app.core.security import encrypt_password, get_password_hash
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
 
 
-def get_all_users(db: Session, include_deleted: bool = False) -> list[User]:
+def get_all_users(
+    db: Session,
+    include_deleted: bool = False,
+    search: str | None = None,
+) -> list[User]:
     query = db.query(User)
 
     if not include_deleted:
         query = query.filter(User.is_deleted.is_(False))
+
+    if search and search.strip():
+        term = f"%{search.strip()}%"
+        query = query.filter(
+            or_(
+                User.username.ilike(term),
+                User.email.ilike(term),
+            )
+        )
 
     return query.order_by(User.created_at.desc()).all()
 
@@ -35,6 +49,7 @@ def get_user_by_email(
 def create_user(db: Session, payload: UserCreate) -> User:
     user = User(
         **payload.model_dump(exclude={"password"}),
+        password_encrypted=encrypt_password(payload.password),
         password_hash=get_password_hash(payload.password),
     )
 
@@ -47,6 +62,12 @@ def create_user(db: Session, payload: UserCreate) -> User:
 
 def update_user(db: Session, user: User, payload: UserUpdate) -> User:
     update_data = payload.model_dump(exclude_unset=True)
+
+    if "password" in update_data:
+        password = update_data.pop("password")
+        if password:
+            user.password_encrypted = encrypt_password(password)
+            user.password_hash = get_password_hash(password)
 
     for field, value in update_data.items():
         setattr(user, field, value)

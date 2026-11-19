@@ -27,10 +27,10 @@ export function SolutionEnvironmentsCard({
               href={srv.target_url}
               target="_blank"
               rel="noreferrer"
-              className="group flex items-center justify-between rounded-lg border border-border/60 bg-muted/20 p-2.5 text-xs transition-colors hover:bg-muted/60"
+              className="group flex items-center justify-between rounded-lg border border-border/60 bg-muted/20 p-2.5 text-sm transition-colors hover:bg-muted/60"
             >
               <div className="flex items-center gap-2 min-w-0">
-                <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-primary">
+                <span className="rounded bg-primary/10 px-1.5 py-0.5 text-xs font-semibold uppercase text-primary">
                   {srv.environment}
                 </span>
                 <span className="truncate font-medium text-foreground group-hover:underline">

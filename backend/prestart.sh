@@ -2,6 +2,8 @@
 
 set -e
 
+export PYTHONPATH=".:/app:${PYTHONPATH:-}"
+
 echo "Running database migrations..."
 
 uv run alembic upgrade head

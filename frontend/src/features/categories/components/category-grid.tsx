@@ -1,13 +1,16 @@
+import { Link } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Empty,
+  EmptyAction,
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { PackageOpen } from "lucide-react";
+import { PackageOpen, Plus } from "lucide-react";
 import { CategoryCard } from "./category-card";
 import type { Category } from "@/types/category.types";
 
@@ -56,6 +59,12 @@ export function CategoryGrid({
                 No categories have been created yet.
               </EmptyDescription>
             </EmptyHeader>
+            <EmptyAction>
+              <Button size="sm" render={<Link to="/categories/new" />}>
+                <Plus className="size-4" />
+                <span>Create Category</span>
+              </Button>
+            </EmptyAction>
           </Empty>
         </CardContent>
       </Card>

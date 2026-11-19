@@ -9,7 +9,7 @@ export function DashboardLayout() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
+      <SidebarInset className="min-w-0">
         <ContentErrorBoundary>
           <Suspense fallback={<RouteLoading />}>
             <Outlet />

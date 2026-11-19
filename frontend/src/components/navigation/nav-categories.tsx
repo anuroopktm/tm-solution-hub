@@ -52,8 +52,7 @@ export function NavCategories() {
                   render={
                     <Link to={`/categories/${category.id}`}>
                       <CategoryIcon
-                        iconKey={category.icon}
-                        categoryIdentifier={category.name}
+                        name={category.icon}
                         className="size-4 shrink-0"
                       />
                       <span>{category.name}</span>
@@ -62,12 +61,6 @@ export function NavCategories() {
                 />
               </SidebarMenuItem>
             ))}
-
-          {!categoriesLoading && (!categories || categories.length === 0) && (
-            <div className="px-3 py-2 text-xs text-muted-foreground">
-              No categories found
-            </div>
-          )}
         </SidebarMenu>
       </SidebarGroup>
     </ScrollArea>

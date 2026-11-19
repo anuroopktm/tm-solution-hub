@@ -44,7 +44,7 @@ export class ContentErrorBoundary extends Component<Props, State> {
               Unable to load this section
             </h2>
 
-            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
               An unexpected error occurred while rendering this page content.
               The sidebar and navigation remain available.
             </p>
@@ -54,7 +54,7 @@ export class ContentErrorBoundary extends Component<Props, State> {
                 variant="default"
                 size="sm"
                 onClick={this.handleRetry}
-                className="gap-1.5 text-xs"
+                className="gap-1.5"
               >
                 <RefreshCw className="size-3.5" />
                 Try Again
@@ -63,7 +63,7 @@ export class ContentErrorBoundary extends Component<Props, State> {
                 variant="outline"
                 size="sm"
                 onClick={() => window.location.reload()}
-                className="gap-1.5 text-xs"
+                className="gap-1.5"
               >
                 Reload Page
               </Button>

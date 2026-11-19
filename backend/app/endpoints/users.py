@@ -18,10 +18,16 @@ router = APIRouter()
     response_model=BaseResponse[list[UserResponse]],
 )
 def get_users(
+    search: str | None = None,
+    include_deleted: bool = False,
     db: Session = Depends(get_db),
     admin: User = Depends(get_current_admin),
 ) -> BaseResponse[list[UserResponse]]:
-    users = user_service.get_all_users(db)
+    users = user_service.get_all_users(
+        db,
+        include_deleted=include_deleted,
+        search=search,
+    )
 
     return BaseResponse(
         detail="Users fetched successfully",

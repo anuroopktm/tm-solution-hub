@@ -2,9 +2,23 @@
 
 from fastapi import APIRouter
 
-from app.endpoints import auth, categories, chat, conversations, solutions, users
+from app.endpoints import (
+    auth,
+    categories,
+    chat,
+    conversations,
+    dashboard,
+    solutions,
+    users,
+)
 
 api_router = APIRouter(prefix="/api")
+
+api_router.include_router(
+    dashboard.router,
+    prefix="/dashboard",
+    tags=["Dashboard"],
+)
 
 api_router.include_router(
     auth.router,

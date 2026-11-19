@@ -12,8 +12,11 @@ router = APIRouter()
 
 
 @router.get("/", response_model=BaseResponse[list[CategoryResponse]])
-def get_categories(db: Session = Depends(get_db)):
-    categories = category_service.get_categories(db)
+def get_categories(
+    search: str | None = None,
+    db: Session = Depends(get_db),
+):
+    categories = category_service.get_categories(db, search=search)
 
     return BaseResponse(
         detail="Categories retrieved successfully",

@@ -102,7 +102,7 @@ export function SolutionCard({ solution, onClick }: SolutionCardProps) {
           {solution.title}
         </CardTitle>
 
-        <CardDescription className="line-clamp-3 text-xs leading-relaxed text-muted-foreground">
+        <CardDescription className="line-clamp-3 leading-relaxed">
           {solution.description || "No description provided."}
         </CardDescription>
       </CardHeader>

@@ -32,8 +32,7 @@ export function CategoryCard({ category, onClick }: CategoryCardProps) {
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-muted/80 to-muted text-muted-foreground/40 transition-colors group-hover/card:text-muted-foreground/70">
             <CategoryIcon
-              iconKey={category.icon}
-              categoryIdentifier={category.name}
+              name={category.icon}
               className="size-12 stroke-[1.25]"
             />
           </div>
@@ -47,11 +46,7 @@ export function CategoryCard({ category, onClick }: CategoryCardProps) {
       <CardHeader className="gap-0">
         <CardTitle className="line-clamp-1 flex items-center gap-2 text-base font-semibold leading-snug transition-colors group-hover/card:text-primary">
           <div className="flex size-6 shrink-0 items-center justify-center rounded-md bg-muted text-foreground">
-            <CategoryIcon
-              iconKey={category.icon}
-              categoryIdentifier={category.name}
-              className="size-3.5"
-            />
+            <CategoryIcon name={category.icon} className="size-3.5" />
           </div>
           <span className="truncate">{category.name}</span>
         </CardTitle>
@@ -65,7 +60,7 @@ export function CategoryCard({ category, onClick }: CategoryCardProps) {
           </Badge>
         </CardAction>
 
-        <CardDescription className="col-span-2 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+        <CardDescription className="col-span-2 line-clamp-2 leading-relaxed">
           {category.description ||
             "Click to explore solutions in this category."}
         </CardDescription>

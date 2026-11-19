@@ -12,6 +12,9 @@ import {
   CategoriesPage,
   CategorySolutionsPage,
   SolutionDetailPage,
+  CreateSolutionPage,
+  ManageCategoriesPage,
+  UsersPage,
 } from "./lazy-components";
 
 export const router = createBrowserRouter([
@@ -41,6 +44,10 @@ export const router = createBrowserRouter([
             element: <ChatPage />,
           },
           {
+            path: ROUTES.CHAT_CONVERSATION,
+            element: <ChatPage />,
+          },
+          {
             path: ROUTES.CATEGORIES,
             element: <CategoriesPage />,
           },
@@ -51,6 +58,18 @@ export const router = createBrowserRouter([
           {
             path: ROUTES.SOLUTION_DETAIL,
             element: <SolutionDetailPage />,
+          },
+          {
+            path: ROUTES.SOLUTION_CREATE,
+            element: <CreateSolutionPage />,
+          },
+          {
+            path: ROUTES.CATEGORY_CREATE,
+            element: <ManageCategoriesPage />,
+          },
+          {
+            path: ROUTES.USERS,
+            element: <UsersPage />,
           },
         ],
       },

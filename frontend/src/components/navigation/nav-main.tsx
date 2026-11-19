@@ -6,7 +6,13 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, MessageSquare } from "lucide-react";
+import {
+  LayoutDashboard,
+  MessageSquare,
+  FilePlus2,
+  Layers,
+  Users,
+} from "lucide-react";
 
 const navMain = [
   {
@@ -18,6 +24,21 @@ const navMain = [
     title: "Chat",
     url: "/chat",
     icon: MessageSquare,
+  },
+  {
+    title: "Create Solution",
+    url: "/solutions/new",
+    icon: FilePlus2,
+  },
+  {
+    title: "Manage Categories",
+    url: "/categories/new",
+    icon: Layers,
+  },
+  {
+    title: "User Management",
+    url: "/users",
+    icon: Users,
   },
 ];
 
@@ -33,7 +54,11 @@ export function NavMain() {
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton
               tooltip={item.title}
-              isActive={location.pathname === item.url}
+              isActive={
+                location.pathname === item.url ||
+                (item.url !== "/dashboard" &&
+                  location.pathname.startsWith(`${item.url}/`))
+              }
               render={
                 <Link to={item.url}>
                   <item.icon className="size-4" />

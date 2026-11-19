@@ -57,10 +57,7 @@ export default function CategorySolutionsPage() {
                 {activeCategory?.name || "Category Solutions"}
               </h1>
               {solutions && (
-                <Badge
-                  variant="secondary"
-                  className="px-2 py-0.5 text-xs font-semibold"
-                >
+                <Badge variant="secondary">
                   {solutions.length}{" "}
                   {solutions.length === 1 ? "solution" : "solutions"}
                 </Badge>

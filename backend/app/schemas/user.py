@@ -12,12 +12,14 @@ class UserCreate(BaseModel):
 class UserUpdate(BaseModel):
     username: str | None = None
     email: EmailStr | None = None
+    password: str | None = None
 
 
 class UserResponse(BaseModel):
     id: uuid.UUID
     username: str
     email: str
+    password: str | None = None
     is_deleted: bool = False
 
     model_config = ConfigDict(from_attributes=True)

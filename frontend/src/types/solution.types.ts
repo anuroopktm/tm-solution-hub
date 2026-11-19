@@ -59,3 +59,43 @@ export interface Solution {
   created_at: string;
   updated_at: string;
 }
+
+export interface SolutionDocumentCreatePayload {
+  name: string;
+  description?: string | null;
+  format: string;
+  file_size_bytes?: number | null;
+  file_url: string;
+}
+
+export interface SolutionVideoCreatePayload {
+  title: string;
+  description?: string | null;
+  thumbnail_url?: string | null;
+  video_url: string;
+  duration_seconds?: number | null;
+}
+
+export interface SolutionServiceUrlCreatePayload {
+  service_name: string;
+  service_type: string;
+  environment: string;
+  target_url: string;
+}
+
+export interface SolutionCreatePayload {
+  title: string;
+  description?: string | null;
+  thumbnail_url?: string | null;
+  preview_url?: string | null;
+  repository_url?: string | null;
+  tech_stack?: string[];
+  key_capabilities?: KeyCapability[] | null;
+  lead_id?: string | null;
+  category_ids?: string[];
+  documents?: SolutionDocumentCreatePayload[];
+  videos?: SolutionVideoCreatePayload[];
+  service_urls?: SolutionServiceUrlCreatePayload[];
+}
+
+export interface SolutionUpdatePayload extends Partial<SolutionCreatePayload> {}
