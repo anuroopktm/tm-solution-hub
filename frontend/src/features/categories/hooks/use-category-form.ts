@@ -49,7 +49,6 @@ export function useCategoryForm({
       name: categoryToEdit?.name ?? "",
       description: categoryToEdit?.description ?? "",
       icon: categoryToEdit?.icon ?? "",
-      thumbnail_url: categoryToEdit?.thumbnail_url ?? "",
     },
   });
 
@@ -58,7 +57,6 @@ export function useCategoryForm({
       name: categoryToEdit?.name ?? "",
       description: categoryToEdit?.description ?? "",
       icon: categoryToEdit?.icon ?? "",
-      thumbnail_url: categoryToEdit?.thumbnail_url ?? "",
     });
   }, [categoryToEdit, form]);
 
@@ -68,7 +66,6 @@ export function useCategoryForm({
         name: values.name.trim(),
         description: values.description.trim(),
         icon: values.icon.trim(),
-        thumbnail_url: values.thumbnail_url.trim(),
       };
 
       if (isEdit && categoryToEdit) {
@@ -81,6 +78,12 @@ export function useCategoryForm({
         await createCategoryMutation.mutateAsync(payload);
         toast.success("Category created successfully");
       }
+
+      form.reset({
+        name: "",
+        description: "",
+        icon: "",
+      });
 
       onSuccess?.();
     } catch (err: unknown) {

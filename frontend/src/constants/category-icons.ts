@@ -11,7 +11,10 @@ export const DEFAULT_CATEGORY_ICON: LucideIcon = Orbit;
 export function getCategoryIcon(iconName?: string | null): LucideIcon {
   if (iconName) {
     const dynamicIcon = (LucideIcons as Record<string, unknown>)[iconName];
-    if (dynamicIcon && typeof dynamicIcon === "function") {
+    if (
+      dynamicIcon &&
+      (typeof dynamicIcon === "function" || typeof dynamicIcon === "object")
+    ) {
       return dynamicIcon as LucideIcon;
     }
   }
@@ -21,12 +24,10 @@ export function getCategoryIcon(iconName?: string | null): LucideIcon {
 
 export interface CategoryIconProps {
   name?: string | null;
-  /** Backwards compatibility alias for `name` */
-  iconKey?: string | null;
   className?: string;
 }
 
-export function CategoryIcon({ name, iconKey, className }: CategoryIconProps) {
-  const IconComponent = getCategoryIcon(name ?? iconKey);
+export function CategoryIcon({ name, className }: CategoryIconProps) {
+  const IconComponent = getCategoryIcon(name);
   return createElement(IconComponent, { className });
 }
