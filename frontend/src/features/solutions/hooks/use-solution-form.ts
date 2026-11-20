@@ -6,6 +6,9 @@ import {
   type FieldErrors,
   type Control,
   type UseFormWatch,
+  type UseFormTrigger,
+  type UseFormGetValues,
+  type UseFormSetValue,
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
@@ -25,6 +28,9 @@ export interface UseSolutionFormReturn {
   handleSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
   errors: FieldErrors<SolutionCreateFormValues>;
   watch: UseFormWatch<SolutionCreateFormValues>;
+  trigger: UseFormTrigger<SolutionCreateFormValues>;
+  getValues: UseFormGetValues<SolutionCreateFormValues>;
+  setValue: UseFormSetValue<SolutionCreateFormValues>;
   isPending: boolean;
   categories: ReturnType<typeof useCategories>["data"];
   categoriesLoading: boolean;
@@ -67,6 +73,8 @@ export function useSolutionForm(): UseSolutionFormReturn {
 
   const form = useForm<SolutionCreateFormValues>({
     resolver: zodResolver(solutionCreateSchema),
+    mode: "onChange",
+    reValidateMode: "onChange",
     defaultValues: {
       title: "",
       description: "",
@@ -83,7 +91,16 @@ export function useSolutionForm(): UseSolutionFormReturn {
     },
   });
 
-  const { control, register, handleSubmit, formState, watch, setValue } = form;
+  const {
+    control,
+    register,
+    handleSubmit,
+    formState,
+    watch,
+    setValue,
+    trigger,
+    getValues,
+  } = form;
 
   const techStack = watch("tech_stack") || [];
   const selectedCategoryIds = watch("category_ids") || [];
@@ -172,6 +189,7 @@ export function useSolutionForm(): UseSolutionFormReturn {
           format: d.format || "PDF",
           file_url: d.file_url.trim(),
           description: d.description || undefined,
+          file_size_bytes: d.file_size_bytes ?? undefined,
         })),
       videos: (values.videos || []).filter(
         (v) => v.title.trim() && v.video_url.trim(),
@@ -196,6 +214,9 @@ export function useSolutionForm(): UseSolutionFormReturn {
     handleSubmit: handleSubmit(onSubmit),
     errors: formState.errors,
     watch,
+    trigger,
+    getValues,
+    setValue,
     isPending: createSolutionMutation.isPending,
     categories,
     categoriesLoading,

@@ -43,16 +43,123 @@ describe("solution.schema", () => {
   it("fails when title is missing", () => {
     const result = solutionCreateSchema.safeParse({
       title: "",
+      description: "Valid description here",
+      category_ids: ["cat-1"],
     });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].message).toBe("Solution title is required");
+      expect(result.error.issues[0].message).toBe(
+        "Title is missing (minimum 2 words required)",
+      );
     }
+  });
+
+  it("fails when title has less than 2 words", () => {
+    const result = solutionCreateSchema.safeParse({
+      title: "Solitary",
+      description: "Valid description here",
+      category_ids: ["cat-1"],
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe(
+        "Title is too short (minimum 2 words required, e.g. 'Enterprise Search')",
+      );
+    }
+  });
+
+  it("fails when description is missing", () => {
+    const result = solutionCreateSchema.safeParse({
+      title: "Valid Title",
+      description: "",
+      category_ids: ["cat-1"],
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe(
+        "Description is missing (minimum 10 characters required)",
+      );
+    }
+  });
+
+  it("fails when description is too short", () => {
+    const result = solutionCreateSchema.safeParse({
+      title: "Valid Title",
+      description: "Short",
+      category_ids: ["cat-1"],
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe(
+        "Description is too short (minimum 10 characters required)",
+      );
+    }
+  });
+
+  it("fails when category_ids is empty", () => {
+    const result = solutionCreateSchema.safeParse({
+      title: "Valid Title",
+      description: "Valid description here",
+      category_ids: [],
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe(
+        "Please select at least 1 domain category",
+      );
+    }
+  });
+
+  it("fails when tech_stack is empty", () => {
+    const result = solutionCreateSchema.safeParse({
+      title: "Valid Title",
+      description: "Valid description here",
+      category_ids: ["cat-1"],
+      tech_stack: [],
+      key_capabilities: [{ name: "Search", description: "Fast search" }],
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe(
+        "Please select or add at least 1 technology or framework",
+      );
+    }
+  });
+
+  it("fails when key_capabilities is empty", () => {
+    const result = solutionCreateSchema.safeParse({
+      title: "Valid Title",
+      description: "Valid description here",
+      category_ids: ["cat-1"],
+      tech_stack: ["React"],
+      key_capabilities: [],
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe(
+        "Please add at least 1 key capability",
+      );
+    }
+  });
+
+  it("fails when key capability title or description is missing", () => {
+    const result = solutionCreateSchema.safeParse({
+      title: "Valid Title",
+      description: "Valid description here",
+      category_ids: ["cat-1"],
+      tech_stack: ["React"],
+      key_capabilities: [{ name: "", description: "" }],
+    });
+    expect(result.success).toBe(false);
   });
 
   it("fails when repository_url is an invalid URL format", () => {
     const result = solutionCreateSchema.safeParse({
       title: "Valid Title",
+      description: "Valid description here",
+      category_ids: ["cat-1"],
+      tech_stack: ["React"],
+      key_capabilities: [{ name: "Search", description: "Fast search" }],
       repository_url: "not-a-valid-url",
     });
     expect(result.success).toBe(false);
@@ -61,6 +168,10 @@ describe("solution.schema", () => {
   it("accepts empty optional URLs", () => {
     const result = solutionCreateSchema.safeParse({
       title: "Valid Title",
+      description: "Valid description here",
+      category_ids: ["cat-1"],
+      tech_stack: ["React"],
+      key_capabilities: [{ name: "Search", description: "Fast search" }],
       repository_url: "",
       preview_url: "",
       thumbnail_url: "",
