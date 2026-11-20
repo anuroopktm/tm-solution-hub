@@ -1,12 +1,12 @@
 import { z } from "zod";
 
-const createOptionalUrl = (label: string) =>
+const createRequiredUrl = (label: string) =>
   z
     .string()
     .trim()
-    .optional()
+    .min(1, `${label} is required`)
     .refine(
-      (val) => !val || /^https?:\/\/.+/.test(val),
+      (val) => /^https?:\/\/.+/.test(val),
       `Please enter a valid ${label} (starting with http:// or https://)`,
     );
 
@@ -55,15 +55,15 @@ export const solutionCreateSchema = z.object({
     .array(z.string())
     .min(1, "Please select at least 1 domain category"),
   lead_id: z.string().optional(),
-  repository_url: createOptionalUrl("Repository URL"),
-  preview_url: createOptionalUrl("Preview URL"),
-  thumbnail_url: createOptionalUrl("Thumbnail URL"),
   tech_stack: z
     .array(z.string())
     .min(1, "Please select or add at least 1 technology or framework"),
   key_capabilities: z
     .array(keyCapabilitySchema)
     .min(1, "Please add at least 1 key capability"),
+  repository_url: createRequiredUrl("Repository URL"),
+  preview_url: createRequiredUrl("Live Preview URL"),
+  thumbnail_url: createRequiredUrl("Thumbnail URL"),
   service_urls: z.array(serviceUrlSchema).optional(),
   documents: z.array(solutionDocumentSchema).optional(),
   videos: z.array(solutionVideoSchema).optional(),

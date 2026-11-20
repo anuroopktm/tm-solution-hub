@@ -8,9 +8,12 @@ import {
   CreateSolutionBreadcrumb,
   SolutionFormHeader,
   SolutionCreateFormView,
+  SolutionFormValidationAlert,
+  SolutionFormFooter,
+  extractErrorMessages,
 } from "./index";
-import type { SolutionCreateFormValues } from "@/schemas/solution.schema";
-import type { UseSolutionFormReturn } from "@/features/solutions/hooks/use-solution-form";
+import type { SolutionCreateFormValues } from "../../../../schemas/solution.schema";
+import type { UseSolutionFormReturn } from "../../hooks/use-solution-form";
 
 describe("Create Solution Views and Steps", () => {
   afterEach(cleanup);
@@ -29,10 +32,10 @@ describe("Create Solution Views and Steps", () => {
   });
 
   describe("SolutionFormHeader", () => {
-    it("renders heading and action buttons", () => {
+    it("renders heading and description without action buttons in the header", () => {
       render(
         <MemoryRouter>
-          <SolutionFormHeader isPending={false} />
+          <SolutionFormHeader />
         </MemoryRouter>,
       );
 
@@ -40,25 +43,16 @@ describe("Create Solution Views and Steps", () => {
         screen.getByRole("heading", { name: "Create Solution" }),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole("button", { name: /cancel/i }),
+        screen.getByText(
+          /Publish a technical solution, architecture blueprint, or reusable codebase/i,
+        ),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole("button", { name: /publish solution/i }),
-      ).toBeInTheDocument();
-    });
-
-    it("disables actions when isPending is true", () => {
-      render(
-        <MemoryRouter>
-          <SolutionFormHeader isPending={true} />
-        </MemoryRouter>,
-      );
-
-      const cancelBtn = screen.getByRole("button", { name: /cancel/i });
-      expect(cancelBtn).toHaveAttribute("data-disabled");
+        screen.queryByRole("button", { name: /cancel/i }),
+      ).not.toBeInTheDocument();
       expect(
-        screen.getByRole("button", { name: /publish solution/i }),
-      ).toBeDisabled();
+        screen.queryByRole("button", { name: /publish solution/i }),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -72,27 +66,29 @@ describe("Create Solution Views and Steps", () => {
       customFormState?: Partial<UseSolutionFormReturn>;
       defaultValues?: Partial<SolutionCreateFormValues>;
     }) {
-      const { control, register, watch } = useForm<SolutionCreateFormValues>({
-        defaultValues: {
-          title: "",
-          description: "",
-          category_ids: [],
-          lead_id: "",
-          repository_url: "",
-          preview_url: "",
-          thumbnail_url: "",
-          tech_stack: ["TypeScript"],
-          key_capabilities: [],
-          service_urls: [],
-          documents: [],
-          videos: [],
-          ...defaultValues,
-        },
-      });
+      const { control, register, watch, setValue } =
+        useForm<SolutionCreateFormValues>({
+          defaultValues: {
+            title: "",
+            description: "",
+            category_ids: [],
+            lead_id: "",
+            repository_url: "",
+            preview_url: "",
+            thumbnail_url: "",
+            tech_stack: ["TypeScript"],
+            key_capabilities: [],
+            service_urls: [],
+            documents: [],
+            videos: [],
+            ...defaultValues,
+          },
+        });
 
       const mockFormState: UseSolutionFormReturn = {
         register,
         control,
+        setValue: setValue as any,
         handleSubmit: vi.fn((e) => {
           e?.preventDefault?.();
           return Promise.resolve();
@@ -123,7 +119,13 @@ describe("Create Solution Views and Steps", () => {
           ...defaultValues,
         }) as any,
         isPending: false,
-        categories: [{ id: "cat-1", name: "Artificial Intelligence" }],
+        categories: [
+          {
+            id: "cat-1",
+            name: "Artificial Intelligence",
+            description: "AI solutions",
+          },
+        ],
         categoriesLoading: false,
         users: [
           {
@@ -229,25 +231,19 @@ describe("Create Solution Views and Steps", () => {
       ).toBeInTheDocument();
     });
 
-    it("renders Step 2 (Deployments & Links) with Project Links and Service Endpoints", () => {
+    it("renders Step 2 (Deployments & Links) with Project Links in individual rows", () => {
       render(
         <SolutionCreateFormViewWrapper
           initialStep={2}
           defaultValues={{
-            service_urls: [
-              {
-                service_name: "REST API",
-                service_type: "REST API",
-                environment: "Production",
-                target_url: "https://api.example.com",
-              },
-            ],
+            repository_url: "https://github.com/organization/repository",
+            preview_url: "https://demo.example.com",
+            thumbnail_url: "https://images.example.com/banner.png",
           }}
         />,
       );
 
       expect(screen.getByText("Deployments & Links")).toBeInTheDocument();
-      expect(screen.getByText("Project Links")).toBeInTheDocument();
       expect(screen.getByLabelText(/repository url/i)).toBeInTheDocument();
       expect(
         screen.getByLabelText(/live preview \/ documentation url/i),
@@ -255,20 +251,9 @@ describe("Create Solution Views and Steps", () => {
       expect(
         screen.getByLabelText(/thumbnail \/ banner image url/i),
       ).toBeInTheDocument();
-
-      // Service Endpoints Combobox and configuration section
-      expect(screen.getByText("Service Endpoints")).toBeInTheDocument();
-      expect(screen.getAllByText("REST API").length).toBeGreaterThanOrEqual(1);
-      expect(
-        screen.getByText("Selected service configuration"),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByLabelText("Service 1 Environment"),
-      ).toBeInTheDocument();
-      expect(screen.getByLabelText("Service 1 Target URL")).toBeInTheDocument();
     });
 
-    it("renders Step 3 (Assets & Review) with assets controls and review summary", () => {
+    it("renders Step 3 (Assets & Media) with assets controls", () => {
       render(
         <SolutionCreateFormViewWrapper
           initialStep={3}
@@ -291,44 +276,46 @@ describe("Create Solution Views and Steps", () => {
         />,
       );
 
-      expect(screen.getByText("Assets & Review")).toBeInTheDocument();
+      expect(
+        screen.getAllByText("Assets & Media").length,
+      ).toBeGreaterThanOrEqual(1);
       expect(screen.getByText("Supplementary Assets")).toBeInTheDocument();
       expect(screen.getByText("2 assets")).toBeInTheDocument();
       expect(screen.getByText("Architecture Diagram")).toBeInTheDocument();
       expect(screen.getByText("PNG · 1.0 MB")).toBeInTheDocument();
       expect(screen.getByText("Product Walkthrough")).toBeInTheDocument();
 
-      // Review details
-      expect(screen.getByText("Review Details")).toBeInTheDocument();
-      expect(screen.getByText("1. General Information")).toBeInTheDocument();
-      expect(screen.getByText("2. Tech & Capabilities")).toBeInTheDocument();
-      expect(screen.getByText("3. Deployments & Links")).toBeInTheDocument();
-      expect(screen.getByText("4. Assets & Media")).toBeInTheDocument();
-
-      // Clicking an edit button in review navigates to that step
-      const editButtons = screen.getAllByRole("button", { name: "Edit" });
-      expect(editButtons.length).toBeGreaterThan(0);
-      fireEvent.click(editButtons[0]);
-      // Should now show Step 0
-      expect(screen.getByText("General Information")).toBeInTheDocument();
+      // Review / preview details are removed
+      expect(screen.queryByText("Review Details")).not.toBeInTheDocument();
     });
 
-    it("reveals inline Add Asset form when Add Asset button is clicked and cancels on cancel", () => {
+    it("reveals inline Add Asset form when Add Asset button is clicked and cancels on discard", () => {
       render(<SolutionCreateFormViewWrapper initialStep={3} />);
 
-      expect(screen.queryByText("Add New Asset")).not.toBeInTheDocument();
+      expect(
+        screen.getByText(
+          /No assets added yet. Click "\+ Add Asset" to attach supplementary media or documents./i,
+        ),
+      ).toBeInTheDocument();
+      expect(screen.queryByText(/asset #1/i)).not.toBeInTheDocument();
 
       const addBtn = screen.getByRole("button", { name: /add asset/i });
       fireEvent.click(addBtn);
 
-      expect(screen.getByText("Add New Asset")).toBeInTheDocument();
+      expect(screen.getByText("Asset #1")).toBeInTheDocument();
       expect(screen.getByLabelText(/asset name/i)).toBeInTheDocument();
       expect(screen.getByText(/choose a file/i)).toBeInTheDocument();
+      // Ensure only the global footer cancel exists, not an inline form cancel
+      const cancelButtons = screen.getAllByRole("button", {
+        name: /^cancel$/i,
+      });
+      expect(cancelButtons).toHaveLength(1);
+      expect(cancelButtons[0]).toHaveAttribute("href", "/dashboard");
 
       const closeBtn = screen.getByRole("button", { name: /close form/i });
       fireEvent.click(closeBtn);
 
-      expect(screen.queryByText("Add New Asset")).not.toBeInTheDocument();
+      expect(screen.queryByText("Asset #1")).not.toBeInTheDocument();
     });
 
     it("displays validation alert when errors are present for the active step", () => {
@@ -407,6 +394,202 @@ describe("Create Solution Views and Steps", () => {
         screen.getByText("Capability description is required"),
       ).toBeInTheDocument();
       expect(screen.queryByText("too_small")).not.toBeInTheDocument();
+    });
+
+    it("displays validation alert on Step 2 when repository_url, preview_url, or thumbnail_url are missing or invalid", () => {
+      render(
+        <SolutionCreateFormViewWrapper
+          initialStep={2}
+          customFormState={{
+            errors: {
+              repository_url: {
+                type: "manual",
+                message: "Repository URL is required",
+              },
+              preview_url: {
+                type: "manual",
+                message: "Live Preview URL is required",
+              },
+              thumbnail_url: {
+                type: "manual",
+                message: "Thumbnail URL is required",
+              },
+            },
+          }}
+        />,
+      );
+
+      expect(
+        screen.getByText("Please resolve the following errors"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("Repository URL is required"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("Live Preview URL is required"),
+      ).toBeInTheDocument();
+      expect(screen.getByText("Thumbnail URL is required")).toBeInTheDocument();
+    });
+
+    it("does not submit the form before the last step", () => {
+      const handleSubmit = vi.fn();
+
+      const { container } = render(
+        <SolutionCreateFormViewWrapper
+          initialStep={1}
+          customFormState={{
+            handleSubmit,
+          }}
+        />,
+      );
+
+      const form = container.querySelector("form");
+      expect(form).toBeInTheDocument();
+
+      // Attempt to submit on Step 1
+      fireEvent.submit(form!);
+
+      // Must NOT submit or create solution prematurely
+      expect(handleSubmit).not.toHaveBeenCalled();
+    });
+
+    it("does not submit the form when clicking Continue to advance from step 2 to step 3", async () => {
+      const handleSubmit = vi.fn();
+
+      render(
+        <SolutionCreateFormViewWrapper
+          initialStep={2}
+          customFormState={{
+            handleSubmit,
+          }}
+        />,
+      );
+
+      // Verify we are on Deployments & Links (Step 2)
+      expect(screen.getByText("Deployments & Links")).toBeInTheDocument();
+
+      // Click Continue
+      const continueBtns = screen.getAllByRole("button", { name: /continue/i });
+      fireEvent.click(continueBtns[0]);
+
+      // Step should now be Assets & Media
+      expect(await screen.findByText("Assets & Media")).toBeInTheDocument();
+
+      // handleSubmit must NOT have been called
+      expect(handleSubmit).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("extractErrorMessages & SolutionFormValidationAlert", () => {
+    it("extracts and deduplicates error messages while ignoring internal metadata", () => {
+      const mockErrors = {
+        title: { message: "Title is required", type: "required" },
+        tech_stack: {
+          message: "Please select at least 1 technology",
+          type: "too_small",
+        },
+        key_capabilities: [
+          {
+            name: { message: "Capability title is required" },
+            description: { message: "Capability title is required" }, // duplicate message
+          },
+        ],
+      };
+
+      const extracted = extractErrorMessages(mockErrors);
+      expect(extracted).toEqual([
+        "Title is required",
+        "Please select at least 1 technology",
+        "Capability title is required",
+      ]);
+      expect(extractErrorMessages(null)).toEqual([]);
+    });
+
+    it("renders nothing when there are no errors for the current step", () => {
+      const { container } = render(
+        <SolutionFormValidationAlert currentStep={0} errors={{}} />,
+      );
+      expect(container.firstChild).toBeNull();
+    });
+
+    it("renders an alert with errors matching the active step", () => {
+      render(
+        <SolutionFormValidationAlert
+          currentStep={0}
+          errors={{
+            title: { type: "required", message: "Title is missing" },
+          }}
+        />,
+      );
+
+      expect(
+        screen.getByText("Please resolve the following errors"),
+      ).toBeInTheDocument();
+      expect(screen.getByText("Title is missing")).toBeInTheDocument();
+    });
+  });
+
+  describe("SolutionFormFooter", () => {
+    it("renders Previous (disabled on step 0), Cancel, and Continue on non-last steps", () => {
+      const onPrev = vi.fn();
+      const onNext = vi.fn();
+      const onPublish = vi.fn();
+
+      render(
+        <MemoryRouter>
+          <SolutionFormFooter
+            currentStep={0}
+            totalSteps={4}
+            isPending={false}
+            canPublish={false}
+            onPrev={onPrev}
+            onNext={onNext}
+            onPublish={onPublish}
+          />
+        </MemoryRouter>,
+      );
+
+      const prevBtn = screen.getByRole("button", { name: /previous/i });
+      expect(prevBtn).toBeDisabled();
+
+      const cancelLink = screen.getByRole("button", { name: /cancel/i });
+      expect(cancelLink).toHaveAttribute("href", "/dashboard");
+
+      const continueBtn = screen.getByRole("button", { name: /continue/i });
+      expect(continueBtn).not.toBeDisabled();
+      fireEvent.click(continueBtn);
+      expect(onNext).toHaveBeenCalledTimes(1);
+    });
+
+    it("renders Publish Solution button on last step", () => {
+      const onPrev = vi.fn();
+      const onNext = vi.fn();
+      const onPublish = vi.fn();
+
+      render(
+        <MemoryRouter>
+          <SolutionFormFooter
+            currentStep={3}
+            totalSteps={4}
+            isPending={false}
+            canPublish={true}
+            onPrev={onPrev}
+            onNext={onNext}
+            onPublish={onPublish}
+          />
+        </MemoryRouter>,
+      );
+
+      expect(
+        screen.queryByRole("button", { name: /continue/i }),
+      ).not.toBeInTheDocument();
+
+      const publishBtn = screen.getByRole("button", {
+        name: /publish solution/i,
+      });
+      expect(publishBtn).not.toBeDisabled();
+      fireEvent.click(publishBtn);
+      expect(onPublish).toHaveBeenCalledTimes(1);
     });
   });
 });

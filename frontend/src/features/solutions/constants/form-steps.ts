@@ -17,8 +17,8 @@ export const FORM_STEPS: StepItem[] = [
     description: "Service URLs & repositories",
   },
   {
-    id: "review",
-    title: "Assets & Review",
-    description: "Media & confirmation",
+    id: "assets",
+    title: "Assets & Media",
+    description: "Supplementary media & files",
   },
 ];

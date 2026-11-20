@@ -7,6 +7,12 @@ export {
   type SolutionCreateFormViewProps,
   CreateSolutionBreadcrumb,
   SolutionFormHeader,
+  SolutionFormValidationAlert,
+  StepGeneralInfo,
+  StepTechCapabilities,
+  StepDeploymentsLinks,
+  StepAssetsMedia,
+  SolutionFormFooter,
 } from "./components/create-solution";
 export { useSolutionForm } from "./hooks/use-solution-form";
 export type { UseSolutionFormReturn } from "./hooks/use-solution-form";

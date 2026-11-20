@@ -117,6 +117,9 @@ describe("solution.schema", () => {
       category_ids: ["cat-1"],
       tech_stack: [],
       key_capabilities: [{ name: "Search", description: "Fast search" }],
+      repository_url: "https://github.com/example/repo",
+      preview_url: "https://example.com/demo",
+      thumbnail_url: "https://example.com/banner.png",
     });
     expect(result.success).toBe(false);
     if (!result.success) {
@@ -133,6 +136,9 @@ describe("solution.schema", () => {
       category_ids: ["cat-1"],
       tech_stack: ["React"],
       key_capabilities: [],
+      repository_url: "https://github.com/example/repo",
+      preview_url: "https://example.com/demo",
+      thumbnail_url: "https://example.com/banner.png",
     });
     expect(result.success).toBe(false);
     if (!result.success) {
@@ -149,6 +155,9 @@ describe("solution.schema", () => {
       category_ids: ["cat-1"],
       tech_stack: ["React"],
       key_capabilities: [{ name: "", description: "" }],
+      repository_url: "https://github.com/example/repo",
+      preview_url: "https://example.com/demo",
+      thumbnail_url: "https://example.com/banner.png",
     });
     expect(result.success).toBe(false);
   });
@@ -161,11 +170,13 @@ describe("solution.schema", () => {
       tech_stack: ["React"],
       key_capabilities: [{ name: "Search", description: "Fast search" }],
       repository_url: "not-a-valid-url",
+      preview_url: "https://example.com/demo",
+      thumbnail_url: "https://example.com/banner.png",
     });
     expect(result.success).toBe(false);
   });
 
-  it("accepts empty optional URLs", () => {
+  it("fails when repository_url is missing", () => {
     const result = solutionCreateSchema.safeParse({
       title: "Valid Title",
       description: "Valid description here",
@@ -173,8 +184,61 @@ describe("solution.schema", () => {
       tech_stack: ["React"],
       key_capabilities: [{ name: "Search", description: "Fast search" }],
       repository_url: "",
+      preview_url: "https://example.com/demo",
+      thumbnail_url: "https://example.com/banner.png",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe("Repository URL is required");
+    }
+  });
+
+  it("fails when preview_url is missing", () => {
+    const result = solutionCreateSchema.safeParse({
+      title: "Valid Title",
+      description: "Valid description here",
+      category_ids: ["cat-1"],
+      tech_stack: ["React"],
+      key_capabilities: [{ name: "Search", description: "Fast search" }],
+      repository_url: "https://github.com/example/repo",
       preview_url: "",
+      thumbnail_url: "https://example.com/banner.png",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe(
+        "Live Preview URL is required",
+      );
+    }
+  });
+
+  it("fails when thumbnail_url is missing", () => {
+    const result = solutionCreateSchema.safeParse({
+      title: "Valid Title",
+      description: "Valid description here",
+      category_ids: ["cat-1"],
+      tech_stack: ["React"],
+      key_capabilities: [{ name: "Search", description: "Fast search" }],
+      repository_url: "https://github.com/example/repo",
+      preview_url: "https://example.com/demo",
       thumbnail_url: "",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe("Thumbnail URL is required");
+    }
+  });
+
+  it("accepts valid required links in Deployments & Links", () => {
+    const result = solutionCreateSchema.safeParse({
+      title: "Valid Title",
+      description: "Valid description here",
+      category_ids: ["cat-1"],
+      tech_stack: ["React"],
+      key_capabilities: [{ name: "Search", description: "Fast search" }],
+      repository_url: "https://github.com/example/repo",
+      preview_url: "https://example.com/demo",
+      thumbnail_url: "https://example.com/banner.png",
     });
     expect(result.success).toBe(true);
   });
