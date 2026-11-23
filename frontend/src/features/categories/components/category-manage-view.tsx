@@ -14,6 +14,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 
 import { useCategories } from "@/hooks/use-categories";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -23,7 +30,7 @@ import { CategoryIcon } from "@/constants/category-icons";
 import { CategoryFormDialog } from "./category-form-dialog";
 import { CategoryDeleteDialog } from "./category-delete-dialog";
 
-import { Plus, Pencil, Trash2, ExternalLink } from "lucide-react";
+import { Plus, Pencil, Trash2, ExternalLink, FolderTree } from "lucide-react";
 
 export function CategoryManageView() {
   const [search, setSearch] = useState("");
@@ -114,10 +121,20 @@ export function CategoryManageView() {
               ))
             ) : categories.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center">
-                  {search.trim()
-                    ? "No categories found matching your search."
-                    : "No categories found."}
+                <TableCell colSpan={4} className="h-48 text-center">
+                  <Empty className="border-none">
+                    <EmptyHeader>
+                      <EmptyMedia variant="icon">
+                        <FolderTree />
+                      </EmptyMedia>
+                      <EmptyTitle>No categories found</EmptyTitle>
+                      <EmptyDescription>
+                        {search.trim()
+                          ? "No categories found matching your search."
+                          : "No categories have been created yet."}
+                      </EmptyDescription>
+                    </EmptyHeader>
+                  </Empty>
                 </TableCell>
               </TableRow>
             ) : (
@@ -150,6 +167,7 @@ export function CategoryManageView() {
                   <TableCell>
                     <div className="flex items-center justify-end gap-2">
                       <Button
+                        nativeButton={false}
                         variant="ghost"
                         size="icon"
                         render={<Link to={`/categories/${cat.id}`} />}

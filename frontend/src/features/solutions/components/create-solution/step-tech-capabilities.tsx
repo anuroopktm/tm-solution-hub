@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, X } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import type { FieldErrors, UseFormRegister } from "react-hook-form";
 import {
   Card,
@@ -131,9 +131,9 @@ export function StepTechCapabilities({
                         onClick={() => removeCapability(idx)}
                         disabled={isPending}
                         aria-label={`Remove Capability ${idx + 1}`}
-                        className="text-muted-foreground hover:text-destructive"
+                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                       >
-                        <X className="size-3.5" />
+                        <Trash2 className="size-4" />
                       </Button>
                     </CardAction>
                   </CardHeader>

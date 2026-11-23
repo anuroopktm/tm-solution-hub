@@ -1,4 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Sparkles } from "lucide-react";
 import type { KeyCapability } from "@/types/solution.types";
 
@@ -18,23 +24,30 @@ export function SolutionCapabilitiesCard({
           <Sparkles className="size-4 text-primary" />
           <span>Key Capabilities</span>
         </CardTitle>
+        <CardDescription>
+          Core architectural pillars and functional strengths.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {capabilities.map((cap, idx) => (
-            <div
+            <Card
+              size="sm"
               key={idx}
-              className="rounded-lg border border-border/60 bg-muted/20 p-3"
+              className="rounded-lg bg-muted shadow-none"
             >
-              <h3 className="text-sm font-semibold text-foreground">
-                {cap.name}
-              </h3>
-              {cap.description && (
-                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                  {cap.description}
-                </p>
-              )}
-            </div>
+              <CardHeader>
+                <CardTitle className="text-sm font-semibold">
+                  {cap.name}
+                </CardTitle>
+
+                {cap.description && (
+                  <CardDescription className="text-xs leading-relaxed">
+                    {cap.description}
+                  </CardDescription>
+                )}
+              </CardHeader>
+            </Card>
           ))}
         </div>
       </CardContent>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useFieldArray } from "react-hook-form";
+import type { SolutionCreateFormValues } from "@/schemas/solution.schema";
 import { useSolutionForm } from "@/features/solutions/hooks/use-solution-form";
 import type { UseSolutionFormReturn } from "@/features/solutions/hooks/use-solution-form";
 import { Stepper } from "@/components/ui/stepper";
@@ -52,7 +53,7 @@ export function SolutionCreateFormView({
     fields: capabilitiesList,
     append: appendCapability,
     remove: removeCapability,
-  } = useFieldArray({
+  } = useFieldArray<SolutionCreateFormValues, "key_capabilities">({
     control,
     name: "key_capabilities",
   });
@@ -61,7 +62,7 @@ export function SolutionCreateFormView({
     fields: documentsList,
     append: appendDocument,
     remove: removeDocument,
-  } = useFieldArray({
+  } = useFieldArray<SolutionCreateFormValues, "documents">({
     control,
     name: "documents",
   });
@@ -70,7 +71,7 @@ export function SolutionCreateFormView({
     fields: videosList,
     append: appendVideo,
     remove: removeVideo,
-  } = useFieldArray({
+  } = useFieldArray<SolutionCreateFormValues, "videos">({
     control,
     name: "videos",
   });
@@ -230,9 +231,10 @@ export function SolutionCreateFormView({
       {/* STEP 3: Assets & Media */}
       {currentStep === 3 && (
         <StepAssetsMedia
+          register={register}
           isPending={isPending}
-          documentsList={documentsList as any}
-          videosList={videosList as any}
+          documentsList={documentsList}
+          videosList={videosList}
           appendDocument={appendDocument}
           removeDocument={removeDocument}
           appendVideo={appendVideo}

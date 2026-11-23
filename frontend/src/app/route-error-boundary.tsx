@@ -13,7 +13,7 @@ import {
   EmptyMedia,
   EmptyTitle,
   EmptyDescription,
-  EmptyAction,
+  EmptyContent,
 } from "@/components/ui/empty";
 import { ROUTES } from "@/routes/paths";
 
@@ -47,8 +47,11 @@ export function RouteErrorBoundary() {
         <CardContent>
           <Empty>
             <EmptyHeader>
-              <EmptyMedia className="bg-destructive/10 text-destructive">
-                <AlertTriangle className="size-7" />
+              <EmptyMedia
+                variant="icon"
+                className="bg-destructive/10 text-destructive"
+              >
+                <AlertTriangle />
               </EmptyMedia>
               <EmptyTitle>
                 {isChunkLoadError
@@ -62,7 +65,7 @@ export function RouteErrorBoundary() {
               </EmptyDescription>
             </EmptyHeader>
 
-            <EmptyAction>
+            <EmptyContent className="flex-row justify-center gap-2">
               <Button size="sm" onClick={handleReload}>
                 <RefreshCw />
                 Reload Application
@@ -76,7 +79,7 @@ export function RouteErrorBoundary() {
                 <Home />
                 Go to Dashboard
               </Button>
-            </EmptyAction>
+            </EmptyContent>
           </Empty>
         </CardContent>
       </Card>

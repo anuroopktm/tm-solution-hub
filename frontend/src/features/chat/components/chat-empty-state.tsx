@@ -1,5 +1,12 @@
 import { MessageSquareDashed } from "lucide-react";
-import { cn } from "@/lib/utils";
+
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 
 export interface ChatEmptyStateProps {
   title?: string;
@@ -13,17 +20,14 @@ export function ChatEmptyState({
   className,
 }: ChatEmptyStateProps) {
   return (
-    <div
-      className={cn(
-        "flex flex-col items-center justify-center p-8 text-center",
-        className,
-      )}
-    >
-      <div className="flex size-10 items-center justify-center rounded-full bg-muted text-muted-foreground">
-        <MessageSquareDashed className="size-5" />
-      </div>
-      <h3 className="mt-3 text-sm font-medium">{title}</h3>
-      <p className="mt-1 text-xs text-muted-foreground">{description}</p>
-    </div>
+    <Empty className={className}>
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <MessageSquareDashed />
+        </EmptyMedia>
+        <EmptyTitle>{title}</EmptyTitle>
+        <EmptyDescription>{description}</EmptyDescription>
+      </EmptyHeader>
+    </Empty>
   );
 }

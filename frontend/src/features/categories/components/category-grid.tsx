@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Empty,
-  EmptyAction,
+  EmptyContent,
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,
@@ -50,21 +50,26 @@ export function CategoryGrid({
       <Card className="shine-card-active w-full rounded-xl p-8 ring-0">
         <CardContent className="p-0">
           <Empty>
-            <EmptyMedia>
-              <PackageOpen />
-            </EmptyMedia>
             <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <PackageOpen />
+              </EmptyMedia>
               <EmptyTitle>No categories available</EmptyTitle>
               <EmptyDescription>
                 No categories have been created yet.
               </EmptyDescription>
             </EmptyHeader>
-            <EmptyAction>
-              <Button size="sm" render={<Link to="/categories/new" />}>
+
+            <EmptyContent className="flex-row justify-center gap-2">
+              <Button
+                size="sm"
+                nativeButton={false}
+                render={<Link to="/categories/new" />}
+              >
                 <Plus className="size-4" />
                 <span>Create Category</span>
               </Button>
-            </EmptyAction>
+            </EmptyContent>
           </Empty>
         </CardContent>
       </Card>

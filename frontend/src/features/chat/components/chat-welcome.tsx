@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 export interface ChatWelcomeProps {
   onSelectPrompt: (promptText: string) => void;
   className?: string;
+  compact?: boolean;
 }
 
 const SUGGESTIONS = [
@@ -39,16 +40,31 @@ const SUGGESTIONS = [
   },
 ];
 
-export function ChatWelcome({ onSelectPrompt, className }: ChatWelcomeProps) {
+export function ChatWelcome({
+  onSelectPrompt,
+  className,
+  compact = false,
+}: ChatWelcomeProps) {
   return (
     <div
       className={cn(
-        "flex flex-1 flex-col items-center justify-center p-6 text-center",
+        "my-auto flex w-full flex-col items-center justify-center text-center @container",
+        compact ? "max-w-sm p-4 py-2" : "max-w-3xl p-4 sm:p-6",
         className,
       )}
     >
-      <div className="max-w-md space-y-1.5">
-        <h1 className="text-2xl font-semibold tracking-tight">
+      <div
+        className={cn(
+          "space-y-1",
+          compact ? "max-w-xs" : "max-w-md space-y-1.5",
+        )}
+      >
+        <h1
+          className={cn(
+            "font-semibold tracking-tight",
+            compact ? "text-lg" : "text-xl sm:text-2xl",
+          )}
+        >
           What can I help you with?
         </h1>
         <p className="text-sm text-muted-foreground">
@@ -56,7 +72,14 @@ export function ChatWelcome({ onSelectPrompt, className }: ChatWelcomeProps) {
         </p>
       </div>
 
-      <div className="mt-8 grid w-full max-w-2xl grid-cols-1 gap-4 sm:grid-cols-2">
+      <div
+        className={cn(
+          "w-full grid-cols-1 gap-2",
+          compact
+            ? "mt-4 grid max-w-sm"
+            : "mt-6 grid max-w-2xl gap-3 @sm:grid-cols-2",
+        )}
+      >
         {SUGGESTIONS.map((item) => {
           const Icon = item.icon;
           return (
@@ -64,13 +87,28 @@ export function ChatWelcome({ onSelectPrompt, className }: ChatWelcomeProps) {
               key={item.title}
               type="button"
               onClick={() => onSelectPrompt(item.prompt)}
-              className="flex flex-col items-start gap-1 rounded-lg border bg-card p-4 text-left transition-colors hover:bg-accent hover:text-accent-foreground"
+              className={cn(
+                "flex flex-col items-start gap-1 rounded-xl border bg-card text-left transition-colors hover:bg-accent hover:text-accent-foreground",
+                compact ? "p-3" : "p-3.5",
+              )}
             >
               <div className="flex items-center gap-2">
-                <Icon className="size-4 text-muted-foreground" />
-                <span className="text-sm font-medium">{item.title}</span>
+                <Icon
+                  className={cn(
+                    "text-muted-foreground",
+                    compact ? "size-4" : "size-4",
+                  )}
+                />
+                <span className="text-xs font-medium sm:text-sm">
+                  {item.title}
+                </span>
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p
+                className={cn(
+                  "line-clamp-2 text-xs text-muted-foreground",
+                  compact && "text-[11px]",
+                )}
+              >
                 {item.description}
               </p>
             </button>

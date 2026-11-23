@@ -34,7 +34,7 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
 
-      <SidebarContent className="overflow-hidden">
+      <SidebarContent className="flex flex-col min-h-0 overflow-hidden">
         <NavMain />
         <NavCategories />
       </SidebarContent>

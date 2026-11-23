@@ -14,6 +14,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 
 import { useUsers, useRestoreUser } from "@/hooks/use-users";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -129,10 +136,20 @@ export function UsersView() {
               ))
             ) : users.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center">
-                  {search.trim()
-                    ? "No users found matching your search."
-                    : "No users found."}
+                <TableCell colSpan={5} className="h-48 text-center">
+                  <Empty className="border-none">
+                    <EmptyHeader>
+                      <EmptyMedia variant="icon">
+                        <UserX />
+                      </EmptyMedia>
+                      <EmptyTitle>No users found</EmptyTitle>
+                      <EmptyDescription>
+                        {search.trim()
+                          ? "No users found matching your search."
+                          : "No users have been added yet."}
+                      </EmptyDescription>
+                    </EmptyHeader>
+                  </Empty>
                 </TableCell>
               </TableRow>
             ) : (

@@ -36,7 +36,7 @@ const MINIMAL_CIRCUIT_TRACKS = [
   // Middle straight bus pair
   {
     id: "ml",
-    d: "M 30 65 H 200",
+    d: "M 30 64.95 L 200 65.05",
     nodeX: 30,
     nodeY: 65,
     dur: "1.8s",
@@ -44,7 +44,7 @@ const MINIMAL_CIRCUIT_TRACKS = [
   },
   {
     id: "mr",
-    d: "M 370 65 H 200",
+    d: "M 370 64.95 L 200 65.05",
     nodeX: 370,
     nodeY: 65,
     dur: "1.8s",

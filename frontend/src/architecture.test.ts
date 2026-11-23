@@ -50,7 +50,7 @@ describe("Architectural Dependency Boundaries", () => {
         const content = fs.readFileSync(file, "utf-8");
         const lines = content.split("\n");
 
-        lines.forEach((line) => {
+        lines.forEach((line: string) => {
           if (forbiddenPattern.test(line)) {
             violations.push({
               file: path.relative(srcDir, file),

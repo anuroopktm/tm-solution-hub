@@ -1,5 +1,30 @@
 import { useState, type ChangeEvent } from "react";
-import { Plus, Trash2, Paperclip, Upload } from "lucide-react";
+import {
+  Plus,
+  XIcon,
+  Paperclip,
+  Upload,
+  FileText,
+  Video,
+  Trash2,
+} from "lucide-react";
+import type { UseFormRegister } from "react-hook-form";
+import type { SolutionCreateFormValues } from "@/schemas/solution.schema";
+import {
+  Attachment,
+  AttachmentAction,
+  AttachmentActions,
+  AttachmentContent,
+  AttachmentDescription,
+  AttachmentGroup,
+  AttachmentMedia,
+  AttachmentTitle,
+  AttachmentTrigger,
+} from "@/components/ui/attachment";
+import {
+  FilePreviewDialog,
+  type FilePreviewItem,
+} from "@/components/ui/file-preview-dialog";
 import {
   Card,
   CardAction,
@@ -20,6 +45,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatFileSize } from "@/utils/formatters";
+import { getMediaType } from "@/utils/media";
 import { cn } from "cn";
 
 export const ASSET_TYPES = [
@@ -35,6 +61,7 @@ export const ASSET_TYPES = [
 export type AssetType = (typeof ASSET_TYPES)[number];
 
 export interface StepAssetsMediaProps {
+  register?: UseFormRegister<SolutionCreateFormValues>;
   isPending: boolean;
   documentsList: Array<{
     id: string;
@@ -67,6 +94,7 @@ export interface StepAssetsMediaProps {
 }
 
 export function StepAssetsMedia({
+  register: _register,
   isPending,
   documentsList,
   videosList,
@@ -82,6 +110,7 @@ export function StepAssetsMedia({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [assetVideoUrl, setAssetVideoUrl] = useState("");
   const [assetError, setAssetError] = useState("");
+  const [previewFile, setPreviewFile] = useState<FilePreviewItem | null>(null);
 
   const totalAssets = documentsList.length + videosList.length;
 
@@ -174,63 +203,154 @@ export function StepAssetsMedia({
 
           {/* Asset List */}
           {totalAssets > 0 && (
-            <div className="divide-y">
-              {documentsList.map((doc, index) => (
-                <div
-                  key={doc.id}
-                  className="flex items-center justify-between gap-3 py-3"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-medium">{doc.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {doc.format}
-                      {doc.file_size_bytes
-                        ? ` · ${formatFileSize(doc.file_size_bytes)}`
-                        : ""}
-                    </p>
-                  </div>
+            <div className="space-y-4">
+              {documentsList.length > 0 && (
+                <AttachmentGroup className="w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                  {documentsList.map((doc, index) => {
+                    const isImage =
+                      Boolean(doc.file_url) &&
+                      (doc.format === "PNG" ||
+                        doc.format === "JPG" ||
+                        doc.format === "JPEG" ||
+                        doc.format === "WEBP" ||
+                        doc.format === "SVG" ||
+                        doc.format === "GIF" ||
+                        getMediaType(doc.file_url) === "image" ||
+                        doc.file_url.startsWith("blob:"));
 
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeDocument(index)}
-                    disabled={isPending}
-                    aria-label={`Remove ${doc.name}`}
-                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
-                </div>
-              ))}
+                    return (
+                      <Attachment
+                        key={doc.id}
+                        orientation="vertical"
+                        className="overflow-hidden"
+                      >
+                        <AttachmentMedia
+                          variant={isImage ? "image" : "icon"}
+                          className={!isImage ? "h-32 w-full" : undefined}
+                        >
+                          {isImage && doc.file_url ? (
+                            <img
+                              src={doc.file_url}
+                              alt={doc.name}
+                              className="h-full w-full object-cover"
+                              onError={(e) => {
+                                (e.currentTarget as HTMLElement).style.display =
+                                  "none";
+                              }}
+                            />
+                          ) : (
+                            <div className="flex flex-col items-center justify-center gap-1.5 p-4 text-center">
+                              <FileText className="size-8 text-primary" />
+                              <span className="text-xs font-semibold uppercase text-muted-foreground">
+                                {doc.format}
+                              </span>
+                            </div>
+                          )}
+                        </AttachmentMedia>
 
-              {videosList.map((video, index) => (
-                <div
-                  key={video.id}
-                  className="flex items-center justify-between gap-3 py-3"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-medium">
-                      {video.title}
-                    </p>
-                    <p className="truncate text-sm text-muted-foreground">
-                      {video.video_url}
-                    </p>
-                  </div>
+                        <AttachmentContent>
+                          <AttachmentTitle>{doc.name}</AttachmentTitle>
+                          <AttachmentDescription>
+                            {doc.format}
+                            {doc.file_size_bytes
+                              ? ` · ${formatFileSize(doc.file_size_bytes)}`
+                              : ""}
+                          </AttachmentDescription>
+                        </AttachmentContent>
 
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeVideo(index)}
-                    disabled={isPending}
-                    aria-label={`Remove ${video.title}`}
-                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
-                </div>
-              ))}
+                        <AttachmentActions>
+                          <AttachmentAction
+                            aria-label={`Remove ${doc.name}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeDocument(index);
+                            }}
+                            disabled={isPending}
+                          >
+                            <XIcon />
+                          </AttachmentAction>
+                        </AttachmentActions>
+
+                        <AttachmentTrigger
+                          render={
+                            <button
+                              type="button"
+                              aria-label={`Preview ${doc.name}`}
+                              onClick={() =>
+                                setPreviewFile({
+                                  name: doc.name,
+                                  url: doc.file_url,
+                                  format: doc.format,
+                                  sizeBytes: doc.file_size_bytes,
+                                  description: doc.description,
+                                  isImage,
+                                })
+                              }
+                            />
+                          }
+                        />
+                      </Attachment>
+                    );
+                  })}
+                </AttachmentGroup>
+              )}
+
+              {videosList.length > 0 && (
+                <AttachmentGroup className="w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                  {videosList.map((video, index) => (
+                    <Attachment
+                      key={video.id}
+                      orientation="vertical"
+                      className="overflow-hidden"
+                    >
+                      <AttachmentMedia
+                        variant="image"
+                        className="flex items-center justify-center bg-muted/80"
+                      >
+                        <Video className="size-8 text-primary opacity-80" />
+                      </AttachmentMedia>
+
+                      <AttachmentContent>
+                        <AttachmentTitle>{video.title}</AttachmentTitle>
+                        <AttachmentDescription>
+                          {video.video_url}
+                        </AttachmentDescription>
+                      </AttachmentContent>
+
+                      <AttachmentActions>
+                        <AttachmentAction
+                          aria-label={`Remove ${video.title}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeVideo(index);
+                          }}
+                          disabled={isPending}
+                        >
+                          <XIcon />
+                        </AttachmentAction>
+                      </AttachmentActions>
+
+                      <AttachmentTrigger
+                        render={
+                          <button
+                            type="button"
+                            aria-label={`Preview ${video.title}`}
+                            onClick={() =>
+                              setPreviewFile({
+                                name: video.title,
+                                url: video.video_url,
+                                format: "VIDEO",
+                                description: "Video Demonstration",
+                                isImage: false,
+                              })
+                            }
+                          />
+                        }
+                      />
+                    </Attachment>
+                  ))}
+                </AttachmentGroup>
+              )}
             </div>
           )}
 
@@ -379,6 +499,12 @@ export function StepAssetsMedia({
           )}
         </div>
       </CardContent>
+
+      <FilePreviewDialog
+        open={Boolean(previewFile)}
+        onOpenChange={(open) => !open && setPreviewFile(null)}
+        file={previewFile}
+      />
     </Card>
   );
 }

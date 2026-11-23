@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Empty,
-  EmptyAction,
+  EmptyContent,
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,
@@ -62,13 +62,11 @@ export function SolutionGrid({
       <Card className="shine-card-active w-full rounded-xl p-8 ring-0">
         <CardContent className="p-0">
           <Empty>
-            <EmptyMedia>
-              <PackageOpen />
-            </EmptyMedia>
-
             <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <PackageOpen />
+              </EmptyMedia>
               <EmptyTitle>No solutions in this category</EmptyTitle>
-
               <EmptyDescription>
                 There are currently no solutions linked to{" "}
                 {categoryName || "this category"}. Check back later or explore
@@ -76,7 +74,7 @@ export function SolutionGrid({
               </EmptyDescription>
             </EmptyHeader>
 
-            <EmptyAction>
+            <EmptyContent className="flex-row justify-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
@@ -84,7 +82,7 @@ export function SolutionGrid({
               >
                 View all categories
               </Button>
-            </EmptyAction>
+            </EmptyContent>
           </Empty>
         </CardContent>
       </Card>

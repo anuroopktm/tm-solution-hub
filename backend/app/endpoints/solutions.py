@@ -4,7 +4,6 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.models.user import User
 from app.schemas.base import BaseResponse
 from app.schemas.solution import (
     SolutionCreate,
@@ -14,6 +13,7 @@ from app.schemas.solution import (
     SolutionUpdate,
 )
 from app.services import solutions as solution_service
+from app.services import users as user_service
 
 router = APIRouter()
 
@@ -63,7 +63,7 @@ def get_solution(solution_id: UUID, db: Session = Depends(get_db)):
 def create_solution(payload: SolutionCreate, db: Session = Depends(get_db)):
     # Validate lead_id if provided
     if payload.lead_id:
-        lead_user = db.query(User).filter(User.id == payload.lead_id).first()
+        lead_user = user_service.get_user_by_id(db, payload.lead_id)
         if not lead_user:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -97,7 +97,7 @@ def update_solution(
         )
 
     if payload.lead_id:
-        lead_user = db.query(User).filter(User.id == payload.lead_id).first()
+        lead_user = user_service.get_user_by_id(db, payload.lead_id)
         if not lead_user:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,

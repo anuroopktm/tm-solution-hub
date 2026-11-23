@@ -124,9 +124,11 @@ describe("useLoginForm", () => {
     const mockUser = {
       id: "u1",
       email: "user@example.com",
+      username: "testuser",
       full_name: "Test User",
       role: "admin",
       is_active: true,
+      is_deleted: false,
       created_at: "2026-01-01T00:00:00Z",
     };
     vi.mocked(authService.login).mockResolvedValueOnce(mockUser);
@@ -161,9 +163,11 @@ describe("useLoginForm", () => {
     const mockUser = {
       id: "u1",
       email: "user@example.com",
+      username: "testuser",
       full_name: "Test User",
       role: "admin",
       is_active: true,
+      is_deleted: false,
       created_at: "2026-01-01T00:00:00Z",
     };
     vi.mocked(authService.login).mockResolvedValueOnce(mockUser);

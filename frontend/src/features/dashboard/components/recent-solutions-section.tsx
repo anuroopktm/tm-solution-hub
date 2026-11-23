@@ -1,9 +1,16 @@
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, PackageOpen } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { SolutionCard } from "@/features/solutions/components/solution-card";
 import type { Solution } from "@/types/solution.types";
 
@@ -50,11 +57,15 @@ export function RecentSolutionsSection({
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
       ) : solutions.length === 0 ? (
-        <div className="rounded-lg border border-dashed p-8 text-center">
-          <p className="text-sm text-muted-foreground">
-            No recent solutions found.
-          </p>
-        </div>
+        <Empty className="rounded-xl border border-dashed p-8">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <PackageOpen />
+            </EmptyMedia>
+            <EmptyTitle>No Recent Solutions</EmptyTitle>
+            <EmptyDescription>No recent solutions found.</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : (
         <ScrollArea className="w-full min-w-0">
           <div className="flex w-max gap-4 pb-4">

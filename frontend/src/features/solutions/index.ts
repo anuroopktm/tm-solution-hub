@@ -1,5 +1,26 @@
 export { SolutionCard } from "./components/solution-card";
+export { SolutionCardFallback } from "./components/solution-card-fallback";
 export { SolutionGrid } from "./components/solution-grid";
+export {
+  SolutionDetailView,
+  type SolutionDetailViewProps,
+} from "./components/detail/solution-detail-view";
+export {
+  SolutionAssetsCard,
+  SolutionAssetList,
+  SolutionAssetItem,
+  SolutionAssetPreviewDialog,
+  AssetPreview,
+} from "./components/assets";
+export {
+  useSolutions,
+  useRecentSolutions,
+  useSolution,
+  useCreateSolution,
+  useUpdateSolution,
+  useDeleteSolution,
+  SOLUTION_QUERY_KEYS,
+} from "@/hooks/use-solutions";
 export {
   SolutionCreateForm,
   SolutionCreateFormView,

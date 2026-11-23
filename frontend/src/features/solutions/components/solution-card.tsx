@@ -5,8 +5,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ImageIcon } from "lucide-react";
 import { getMediaType } from "@/utils/media";
+import { SolutionCardFallback } from "./solution-card-fallback";
 import type { Solution } from "@/types/solution.types";
 
 interface SolutionCardProps {
@@ -59,37 +59,9 @@ export function SolutionCard({ solution, onClick }: SolutionCardProps) {
             preload="none"
             className="h-full w-full object-cover transition-transform duration-300 group-hover/card:scale-105"
           />
-        ) : thumbnailUrl || (mediaType === "gif" && previewUrl) ? (
-          <>
-            {/* Static Image / Poster */}
-            {thumbnailUrl ? (
-              <img
-                src={thumbnailUrl}
-                alt={solution.title}
-                loading="lazy"
-                className="h-full w-full object-cover transition-transform duration-300 group-hover/card:scale-105"
-              />
-            ) : null}
-
-            {/* Hover-to-play GIF overlay */}
-            {mediaType === "gif" && previewUrl ? (
-              <img
-                src={previewUrl}
-                alt={`${solution.title} animation`}
-                loading="lazy"
-                className={`absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover/card:scale-105 ${
-                  thumbnailUrl
-                    ? "opacity-0 transition-opacity duration-300 group-hover/card:opacity-100"
-                    : "opacity-100"
-                }`}
-              />
-            ) : null}
-          </>
         ) : (
-          /* Graceful Fallback Placeholder */
-          <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-muted/80 to-muted text-muted-foreground/50 transition-colors group-hover/card:text-muted-foreground">
-            <ImageIcon className="size-10 stroke-[1.25]" />
-          </div>
+          /* Animated Conforge Brand SVG Banner (like Category) */
+          <SolutionCardFallback />
         )}
 
         {/* Subtle Dark Overlay on Hover for Contrast */}

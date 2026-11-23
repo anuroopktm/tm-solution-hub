@@ -1,4 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { ExternalLink, Globe } from "lucide-react";
 import type { SolutionServiceUrl } from "@/types/solution.types";
 
@@ -16,9 +23,13 @@ export function SolutionEnvironmentsCard({
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base font-semibold">
           <Globe className="size-4 text-primary" />
-          <span>Live Environments</span>
+          Live Environments
         </CardTitle>
+        <CardDescription>
+          Direct deployment targets and service endpoints.
+        </CardDescription>
       </CardHeader>
+
       <CardContent>
         <div className="space-y-2">
           {serviceUrls.map((srv) => (
@@ -26,18 +37,21 @@ export function SolutionEnvironmentsCard({
               key={srv.id}
               href={srv.target_url}
               target="_blank"
-              rel="noreferrer"
-              className="group flex items-center justify-between rounded-lg border border-border/60 bg-muted/20 p-2.5 text-sm transition-colors hover:bg-muted/60"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between gap-3 rounded-lg border p-3 text-sm transition-colors hover:bg-muted/50"
             >
-              <div className="flex items-center gap-2 min-w-0">
-                <span className="rounded bg-primary/10 px-1.5 py-0.5 text-xs font-semibold uppercase text-primary">
-                  {srv.environment}
-                </span>
-                <span className="truncate font-medium text-foreground group-hover:underline">
-                  {srv.service_name}
-                </span>
+              <div className="flex min-w-0 items-center gap-2">
+                <Badge
+                  variant="secondary"
+                  className="shrink-0 text-xs font-normal"
+                >
+                  {srv.environment || "Target"}
+                </Badge>
+
+                <span className="truncate font-medium">{srv.service_name}</span>
               </div>
-              <ExternalLink className="size-3 text-muted-foreground group-hover:text-foreground" />
+
+              <ExternalLink className="size-4 shrink-0 text-muted-foreground" />
             </a>
           ))}
         </div>
