@@ -4,8 +4,10 @@ set -e
 
 export PYTHONPATH=".:/app:${PYTHONPATH:-}"
 
-echo "Running database migrations..."
+echo "Syncing dependencies in container..."
+uv sync --frozen
 
+echo "Running database migrations..."
 uv run alembic upgrade head
 
 echo "Migrations completed successfully."

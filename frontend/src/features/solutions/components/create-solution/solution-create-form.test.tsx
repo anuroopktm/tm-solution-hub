@@ -2,7 +2,8 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { MemoryRouter } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import {
   CreateSolutionBreadcrumb,
@@ -85,6 +86,19 @@ describe("Create Solution Views and Steps", () => {
           },
         });
 
+      const capabilitiesFieldArray = useFieldArray({
+        control,
+        name: "key_capabilities",
+      });
+      const documentsFieldArray = useFieldArray({
+        control,
+        name: "documents",
+      });
+      const videosFieldArray = useFieldArray({
+        control,
+        name: "videos",
+      });
+
       const mockFormState: UseSolutionFormReturn = {
         register,
         control,
@@ -144,28 +158,55 @@ describe("Create Solution Views and Steps", () => {
         handleKeyDownTech: vi.fn(),
         selectedCategoryIds: ["cat-1"],
         toggleCategory: vi.fn(),
-        capabilities: [{ id: "cap-1" }],
-        handleAddCapability: vi.fn(),
-        handleRemoveCapability: vi.fn(),
+        capabilities: (capabilitiesFieldArray.fields.length > 0
+          ? capabilitiesFieldArray.fields
+          : [{ id: "cap-1" }]) as any,
+        handleAddCapability: (cap?: any) =>
+          capabilitiesFieldArray.append({
+            name: cap?.name ?? "",
+            description: cap?.description ?? "",
+          }),
+        handleRemoveCapability: capabilitiesFieldArray.remove,
         serviceUrls: [{ id: "svc-1" }],
         handleAddService: vi.fn(),
         handleRemoveService: vi.fn(),
-        documents: [],
-        handleAddDocument: vi.fn(),
-        handleRemoveDocument: vi.fn(),
-        videos: [],
-        handleAddVideo: vi.fn(),
-        handleRemoveVideo: vi.fn(),
+        documents: documentsFieldArray.fields as any,
+        handleAddDocument: (doc?: any) =>
+          documentsFieldArray.append({
+            name: doc?.name ?? "",
+            format: doc?.format ?? "DOCUMENT",
+            file_url: doc?.file_url ?? "",
+            description: doc?.description ?? "",
+            file_size_bytes: doc?.file_size_bytes ?? 0,
+          }),
+        handleRemoveDocument: documentsFieldArray.remove,
+        videos: videosFieldArray.fields as any,
+        handleAddVideo: (vid?: any) =>
+          videosFieldArray.append({
+            title: vid?.title ?? "",
+            video_url: vid?.video_url ?? "",
+            description: vid?.description ?? "",
+          }),
+        handleRemoveVideo: videosFieldArray.remove,
         ...customFormState,
       };
 
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: { retry: false },
+          mutations: { retry: false },
+        },
+      });
+
       return (
-        <MemoryRouter>
-          <SolutionCreateFormView
-            {...mockFormState}
-            initialStep={initialStep}
-          />
-        </MemoryRouter>
+        <QueryClientProvider client={queryClient}>
+          <MemoryRouter>
+            <SolutionCreateFormView
+              {...mockFormState}
+              initialStep={initialStep}
+            />
+          </MemoryRouter>
+        </QueryClientProvider>
       );
     }
 
@@ -279,43 +320,62 @@ describe("Create Solution Views and Steps", () => {
       expect(
         screen.getAllByText("Assets & Media").length,
       ).toBeGreaterThanOrEqual(1);
-      expect(screen.getByText("Supplementary Assets")).toBeInTheDocument();
-      expect(screen.getByText("2 assets")).toBeInTheDocument();
-      expect(screen.getByText("Architecture Diagram")).toBeInTheDocument();
-      expect(screen.getByText("PNG · 1.0 MB")).toBeInTheDocument();
-      expect(screen.getByText("Product Walkthrough")).toBeInTheDocument();
+      expect(
+        screen.getByText("Documents & Architecture Blueprints"),
+      ).toBeInTheDocument();
+      expect(screen.getByText("Demonstration Videos")).toBeInTheDocument();
+      expect(
+        screen.getByDisplayValue("Architecture Diagram"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByDisplayValue("Product Walkthrough"),
+      ).toBeInTheDocument();
+      expect(screen.getByText("Document #1")).toBeInTheDocument();
+      expect(screen.getByText("Video #1")).toBeInTheDocument();
 
       // Review / preview details are removed
       expect(screen.queryByText("Review Details")).not.toBeInTheDocument();
     });
 
-    it("reveals inline Add Asset form when Add Asset button is clicked and cancels on discard", () => {
+    it("reveals inline Add Document and Add Video cards when buttons are clicked and allows deletion", () => {
       render(<SolutionCreateFormViewWrapper initialStep={3} />);
 
       expect(
         screen.getByText(
-          /No assets added yet. Click "\+ Add Asset" to attach supplementary media or documents./i,
+          /No documents added yet\. Click "\+ Add Document" to attach system diagrams or documentation\./i,
         ),
       ).toBeInTheDocument();
-      expect(screen.queryByText(/asset #1/i)).not.toBeInTheDocument();
+      expect(
+        screen.getByText(
+          /No videos added yet\. Click "\+ Add Video" to link Loom, YouTube, or recorded demonstrations\./i,
+        ),
+      ).toBeInTheDocument();
+      expect(screen.queryByText(/Document #1/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Video #1/i)).not.toBeInTheDocument();
 
-      const addBtn = screen.getByRole("button", { name: /add asset/i });
-      fireEvent.click(addBtn);
+      const addDocBtn = screen.getByRole("button", { name: /add document/i });
+      fireEvent.click(addDocBtn);
 
-      expect(screen.getByText("Asset #1")).toBeInTheDocument();
-      expect(screen.getByLabelText(/asset name/i)).toBeInTheDocument();
-      expect(screen.getByText(/choose a file/i)).toBeInTheDocument();
-      // Ensure only the global footer cancel exists, not an inline form cancel
-      const cancelButtons = screen.getAllByRole("button", {
-        name: /^cancel$/i,
+      expect(screen.getByText("Document #1")).toBeInTheDocument();
+      expect(screen.getByLabelText(/document title/i)).toBeInTheDocument();
+
+      const addVideoBtn = screen.getByRole("button", { name: /add video/i });
+      fireEvent.click(addVideoBtn);
+
+      expect(screen.getByText("Video #1")).toBeInTheDocument();
+      expect(screen.getByLabelText(/video title/i)).toBeInTheDocument();
+
+      const removeDocBtn = screen.getByRole("button", {
+        name: /remove document 1/i,
       });
-      expect(cancelButtons).toHaveLength(1);
-      expect(cancelButtons[0]).toHaveAttribute("href", "/dashboard");
+      fireEvent.click(removeDocBtn);
+      expect(screen.queryByText("Document #1")).not.toBeInTheDocument();
 
-      const closeBtn = screen.getByRole("button", { name: /close form/i });
-      fireEvent.click(closeBtn);
-
-      expect(screen.queryByText("Asset #1")).not.toBeInTheDocument();
+      const removeVideoBtn = screen.getByRole("button", {
+        name: /remove video 1/i,
+      });
+      fireEvent.click(removeVideoBtn);
+      expect(screen.queryByText("Video #1")).not.toBeInTheDocument();
     });
 
     it("displays validation alert when errors are present for the active step", () => {

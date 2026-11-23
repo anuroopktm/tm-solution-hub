@@ -19,6 +19,14 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str | None = None
     OPENAI_MODEL: str | None = None
 
+    # MinIO / S3 Object Storage Configuration
+    S3_ENDPOINT_URL: str = "http://localhost:9000"
+    S3_PUBLIC_ENDPOINT_URL: str = "http://localhost:9000"
+    S3_ACCESS_KEY: str = "minioadmin"
+    S3_SECRET_KEY: str = "minioadmin"
+    S3_BUCKET_NAME: str = "tm-solution-hub"
+    S3_REGION_NAME: str = "us-east-1"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

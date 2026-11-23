@@ -27,9 +27,15 @@ export {
 export {
   StepAssetsMedia,
   type StepAssetsMediaProps,
-  ASSET_TYPES,
-  type AssetType,
 } from "./step-assets-media";
+export {
+  StepAssetsDocumentCard,
+  type StepAssetsDocumentCardProps,
+} from "./step-assets-document-card";
+export {
+  StepAssetsVideoCard,
+  type StepAssetsVideoCardProps,
+} from "./step-assets-video-card";
 export {
   SolutionFormFooter,
   type SolutionFormFooterProps,

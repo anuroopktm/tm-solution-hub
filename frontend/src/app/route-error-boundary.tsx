@@ -43,40 +43,41 @@ export function RouteErrorBoundary() {
 
   return (
     <div className="login-pattern relative flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
-      <Card className="w-full max-w-md">
-        <CardContent>
-          <Empty>
-            <EmptyHeader>
+      <Card className="w-full max-w-lg rounded-xl ring-0">
+        <CardContent className="p-0">
+          <Empty className="min-h-90 gap-6 p-8">
+            <EmptyHeader className="gap-3">
               <EmptyMedia
                 variant="icon"
-                className="bg-destructive/10 text-destructive"
+                className="size-16 rounded-2xl bg-destructive/10 text-destructive"
               >
-                <AlertTriangle />
+                <AlertTriangle className="size-8" />
               </EmptyMedia>
-              <EmptyTitle>
+
+              <EmptyTitle className="text-xl">
                 {isChunkLoadError
                   ? "Application Update Detected"
                   : "Something went wrong"}
               </EmptyTitle>
-              <EmptyDescription>
+
+              <EmptyDescription className="max-w-sm text-center">
                 {isChunkLoadError
-                  ? "A newer version of the application is available or network connection was interrupted while loading this section. Please reload."
+                  ? "A newer version of the application is available or your network connection was interrupted while loading this section. Please reload."
                   : errorMessage}
               </EmptyDescription>
             </EmptyHeader>
 
-            <EmptyContent className="flex-row justify-center gap-2">
+            <EmptyContent className="flex-row flex-wrap justify-center gap-2">
               <Button size="sm" onClick={handleReload}>
-                <RefreshCw />
+                <RefreshCw className="size-4" />
                 Reload Application
               </Button>
 
               <Button
                 variant="outline"
-                size="sm"
                 onClick={() => navigate(ROUTES.DASHBOARD)}
               >
-                <Home />
+                <Home className="size-4" />
                 Go to Dashboard
               </Button>
             </EmptyContent>

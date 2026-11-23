@@ -9,6 +9,7 @@ from app.endpoints import (
     conversations,
     dashboard,
     solutions,
+    storage,
     users,
 )
 
@@ -54,4 +55,10 @@ api_router.include_router(
     chat.router,
     prefix="/chat",
     tags=["Chat"],
+)
+
+api_router.include_router(
+    storage.router,
+    prefix="/storage",
+    tags=["Storage"],
 )

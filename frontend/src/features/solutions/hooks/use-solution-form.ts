@@ -47,17 +47,39 @@ export interface UseSolutionFormReturn {
   selectedCategoryIds: string[];
   toggleCategory: (categoryId: string) => void;
   // Dynamic field arrays
-  capabilities: { id: string }[];
-  handleAddCapability: () => void;
+  capabilities: Array<{ id: string; name?: string; description?: string }>;
+  handleAddCapability: (cap?: { name?: string; description?: string }) => void;
   handleRemoveCapability: (index: number) => void;
-  serviceUrls: { id: string }[];
+  serviceUrls: Array<{ id: string }>;
   handleAddService: () => void;
   handleRemoveService: (index: number) => void;
-  documents: { id: string }[];
-  handleAddDocument: () => void;
+  documents: Array<{
+    id: string;
+    name?: string;
+    format?: string;
+    file_url?: string;
+    description?: string;
+    file_size_bytes?: number;
+  }>;
+  handleAddDocument: (doc?: {
+    name?: string;
+    format?: string;
+    file_url?: string;
+    description?: string;
+    file_size_bytes?: number;
+  }) => void;
   handleRemoveDocument: (index: number) => void;
-  videos: { id: string }[];
-  handleAddVideo: () => void;
+  videos: Array<{
+    id: string;
+    title?: string;
+    video_url?: string;
+    description?: string;
+  }>;
+  handleAddVideo: (video?: {
+    title?: string;
+    video_url?: string;
+    description?: string;
+  }) => void;
   handleRemoveVideo: (index: number) => void;
 }
 
@@ -231,8 +253,11 @@ export function useSolutionForm(): UseSolutionFormReturn {
     selectedCategoryIds,
     toggleCategory,
     capabilities: capabilitiesFieldArray.fields,
-    handleAddCapability: () =>
-      capabilitiesFieldArray.append({ name: "", description: "" }),
+    handleAddCapability: (cap?: { name?: string; description?: string }) =>
+      capabilitiesFieldArray.append({
+        name: cap?.name ?? "",
+        description: cap?.description ?? "",
+      }),
     handleRemoveCapability: capabilitiesFieldArray.remove,
     serviceUrls: serviceUrlsFieldArray.fields,
     handleAddService: () =>
@@ -244,20 +269,31 @@ export function useSolutionForm(): UseSolutionFormReturn {
       }),
     handleRemoveService: serviceUrlsFieldArray.remove,
     documents: documentsFieldArray.fields,
-    handleAddDocument: () =>
+    handleAddDocument: (doc?: {
+      name?: string;
+      format?: string;
+      file_url?: string;
+      description?: string;
+      file_size_bytes?: number;
+    }) =>
       documentsFieldArray.append({
-        name: "",
-        format: "PDF",
-        file_url: "",
-        description: "",
+        name: doc?.name ?? "",
+        format: doc?.format ?? "DOCUMENT",
+        file_url: doc?.file_url ?? "",
+        description: doc?.description ?? "",
+        file_size_bytes: doc?.file_size_bytes ?? 0,
       }),
     handleRemoveDocument: documentsFieldArray.remove,
     videos: videosFieldArray.fields,
-    handleAddVideo: () =>
+    handleAddVideo: (video?: {
+      title?: string;
+      video_url?: string;
+      description?: string;
+    }) =>
       videosFieldArray.append({
-        title: "",
-        video_url: "",
-        description: "",
+        title: video?.title ?? "",
+        video_url: video?.video_url ?? "",
+        description: video?.description ?? "",
       }),
     handleRemoveVideo: videosFieldArray.remove,
   };

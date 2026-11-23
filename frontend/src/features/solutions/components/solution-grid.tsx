@@ -59,27 +59,27 @@ export function SolutionGrid({
   // Category Empty State (No solutions exist in category)
   if (!solutions || solutions.length === 0) {
     return (
-      <Card className="shine-card-active w-full rounded-xl p-8 ring-0">
+      <Card className="shine-card-active w-full rounded-xl ring-0">
         <CardContent className="p-0">
-          <Empty>
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <PackageOpen />
+          <Empty className="min-h-80 gap-6">
+            <EmptyHeader className="gap-3">
+              <EmptyMedia variant="icon" className="size-16 rounded-2xl">
+                <PackageOpen className="size-8" />
               </EmptyMedia>
-              <EmptyTitle>No solutions in this category</EmptyTitle>
-              <EmptyDescription>
+
+              <EmptyTitle className="text-lg">
+                No solutions in this category
+              </EmptyTitle>
+
+              <EmptyDescription className="max-w-sm text-center">
                 There are currently no solutions linked to{" "}
                 {categoryName || "this category"}. Check back later or explore
                 other categories.
               </EmptyDescription>
             </EmptyHeader>
 
-            <EmptyContent className="flex-row justify-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onNavigateCategories}
-              >
+            <EmptyContent className="flex-row justify-center">
+              <Button variant="outline" onClick={onNavigateCategories}>
                 View all categories
               </Button>
             </EmptyContent>

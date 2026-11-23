@@ -47,27 +47,31 @@ export function CategoryGrid({
 
   if (categories && categories.length === 0) {
     return (
-      <Card className="shine-card-active w-full rounded-xl p-8 ring-0">
+      <Card className="shine-card-active w-full rounded-xl ring-0">
         <CardContent className="p-0">
-          <Empty>
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <PackageOpen />
+          <Empty className="min-h-80 gap-6">
+            <EmptyHeader className="gap-3">
+              <EmptyMedia variant="icon" className="size-16 rounded-2xl">
+                <PackageOpen className="size-8" />
               </EmptyMedia>
-              <EmptyTitle>No categories available</EmptyTitle>
-              <EmptyDescription>
-                No categories have been created yet.
+
+              <EmptyTitle className="text-lg">
+                No categories available
+              </EmptyTitle>
+
+              <EmptyDescription className="max-w-sm text-center">
+                No categories have been created yet. Create your first category
+                to start organizing your solutions.
               </EmptyDescription>
             </EmptyHeader>
 
-            <EmptyContent className="flex-row justify-center gap-2">
+            <EmptyContent className="flex-row justify-center">
               <Button
-                size="sm"
                 nativeButton={false}
                 render={<Link to="/categories/new" />}
               >
-                <Plus className="size-4" />
-                <span>Create Category</span>
+                <Plus />
+                Create Category
               </Button>
             </EmptyContent>
           </Empty>

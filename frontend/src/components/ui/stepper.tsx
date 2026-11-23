@@ -56,8 +56,12 @@ export function Stepper({
               >
                 <span
                   className={cn(
-                    "block h-full rounded-full bg-primary transition-all duration-300 motion-reduce:transition-none",
-                    isCompleted || isCurrent ? "w-full" : "w-0",
+                    "block h-full rounded-full transition-all duration-300 motion-reduce:transition-none",
+                    isCurrent
+                      ? "w-full bg-primary"
+                      : isCompleted
+                        ? "w-full bg-primary/75"
+                        : "w-0",
                   )}
                 />
               </span>

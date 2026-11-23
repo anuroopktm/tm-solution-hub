@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useFieldArray } from "react-hook-form";
-import type { SolutionCreateFormValues } from "@/schemas/solution.schema";
 import { useSolutionForm } from "@/features/solutions/hooks/use-solution-form";
 import type { UseSolutionFormReturn } from "@/features/solutions/hooks/use-solution-form";
 import { Stepper } from "@/components/ui/stepper";
@@ -41,40 +39,22 @@ export function SolutionCreateFormView({
   handleRemoveTech,
   selectedCategoryIds,
   toggleCategory,
+  setValue,
   initialStep = 0,
+  capabilities,
+  handleAddCapability,
+  handleRemoveCapability,
+  documents,
+  handleAddDocument,
+  handleRemoveDocument,
+  videos,
+  handleAddVideo,
+  handleRemoveVideo,
 }: SolutionCreateFormViewProps) {
   const [currentStep, setCurrentStep] = useState(initialStep);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(
     new Set(Array.from({ length: initialStep }, (_, i) => i)),
   );
-
-  // Dynamic field arrays
-  const {
-    fields: capabilitiesList,
-    append: appendCapability,
-    remove: removeCapability,
-  } = useFieldArray<SolutionCreateFormValues, "key_capabilities">({
-    control,
-    name: "key_capabilities",
-  });
-
-  const {
-    fields: documentsList,
-    append: appendDocument,
-    remove: removeDocument,
-  } = useFieldArray<SolutionCreateFormValues, "documents">({
-    control,
-    name: "documents",
-  });
-
-  const {
-    fields: videosList,
-    append: appendVideo,
-    remove: removeVideo,
-  } = useFieldArray<SolutionCreateFormValues, "videos">({
-    control,
-    name: "videos",
-  });
 
   // Technologies & Frameworks sync with MultiSelectCombobox
   const watchedTech = useMemo(() => {
@@ -115,7 +95,15 @@ export function SolutionCreateFormView({
 
   const handlePrev = () => {
     if (currentStep > 0) {
-      setCurrentStep((prev) => prev - 1);
+      const prevStep = currentStep - 1;
+      setCurrentStep(prevStep);
+      setCompletedSteps((prev) => {
+        const next = new Set(prev);
+        for (let s = prevStep; s < totalSteps; s++) {
+          next.delete(s);
+        }
+        return next;
+      });
       scrollToTop();
     }
   };
@@ -123,6 +111,13 @@ export function SolutionCreateFormView({
   const handleStepClick = async (targetStepIndex: number) => {
     if (targetStepIndex < currentStep) {
       setCurrentStep(targetStepIndex);
+      setCompletedSteps((prev) => {
+        const next = new Set(prev);
+        for (let s = targetStepIndex; s < totalSteps; s++) {
+          next.delete(s);
+        }
+        return next;
+      });
       scrollToTop();
       return;
     }
@@ -213,9 +208,9 @@ export function SolutionCreateFormView({
           watchedTech={watchedTech}
           handleAddTech={handleAddTech}
           handleRemoveTech={handleRemoveTech}
-          capabilitiesList={capabilitiesList}
-          appendCapability={appendCapability}
-          removeCapability={removeCapability}
+          capabilitiesList={capabilities}
+          appendCapability={handleAddCapability}
+          removeCapability={handleRemoveCapability}
         />
       )}
 
@@ -223,6 +218,7 @@ export function SolutionCreateFormView({
       {currentStep === 2 && (
         <StepDeploymentsLinks
           register={register}
+          setValue={setValue}
           errors={errors}
           isPending={isPending}
         />
@@ -232,13 +228,16 @@ export function SolutionCreateFormView({
       {currentStep === 3 && (
         <StepAssetsMedia
           register={register}
+          setValue={setValue}
+          watch={watch}
+          errors={errors}
           isPending={isPending}
-          documentsList={documentsList}
-          videosList={videosList}
-          appendDocument={appendDocument}
-          removeDocument={removeDocument}
-          appendVideo={appendVideo}
-          removeVideo={removeVideo}
+          documentsList={documents}
+          videosList={videos}
+          appendDocument={handleAddDocument}
+          removeDocument={handleRemoveDocument}
+          appendVideo={handleAddVideo}
+          removeVideo={handleRemoveVideo}
         />
       )}
 
