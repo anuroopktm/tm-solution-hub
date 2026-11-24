@@ -12,6 +12,7 @@ import {
 
 import {
   Card,
+  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -40,6 +41,7 @@ export function CategorySolutionsChart({
 
     return stats.categories_distribution.map((item, index) => {
       const color = getCategoryShade(index, totalCategories);
+
       return {
         name: item.name,
         shorthand: getCategoryShorthand(item.name),
@@ -50,36 +52,51 @@ export function CategorySolutionsChart({
     });
   }, [stats]);
 
+  const summaryMetrics = stats
+    ? [
+        {
+          label: "Total Solutions",
+          value: stats.totals.solutions,
+        },
+        {
+          label: "Categories",
+          value: stats.totals.categories,
+        },
+        {
+          label: "Recent Updates",
+          value: stats.totals.recent,
+        },
+      ]
+    : [];
+
   if (isLoading || !stats) {
     return (
-      <Card className="w-full gap-0 py-0">
-        <CardHeader className="flex flex-col items-stretch border-b p-0 sm:flex-row">
-          <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-4">
+      <Card className="w-full gap-0 overflow-hidden">
+        <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1">
             <Skeleton className="h-5 w-44" />
             <Skeleton className="h-4 w-64" />
           </div>
 
-          <div className="flex">
-            <Skeleton className="h-16 flex-1 rounded-none sm:w-28" />
-            <Skeleton className="h-16 flex-1 rounded-none sm:w-28" />
-            <Skeleton className="h-16 flex-1 rounded-none sm:w-28" />
+          <div className="flex flex-wrap gap-2">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <Skeleton key={index} className="h-18 w-28 rounded-lg" />
+            ))}
           </div>
         </CardHeader>
 
-        <CardContent className="px-2 py-4 sm:p-6">
+        <CardContent>
           <Skeleton className="h-65 w-full rounded-md" />
         </CardContent>
       </Card>
     );
   }
 
-  const totals = stats.totals;
-
   return (
-    <Card className="w-full gap-0 overflow-hidden py-0">
-      {/* Header with Summary Metrics */}
-      <CardHeader className="flex flex-col items-stretch border-b p-0 sm:flex-row">
-        <div className="flex flex-1 flex-col justify-center gap-1 px-6 pt-4 pb-3 sm:py-0">
+    <Card className="w-full gap-0 overflow-hidden">
+      {/* Header */}
+      <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-1">
           <CardTitle>Solutions Overview</CardTitle>
           <CardDescription>
             Distribution of technical solutions across categories.
@@ -87,36 +104,29 @@ export function CategorySolutionsChart({
         </div>
 
         {/* Summary Metrics */}
-        <div className="grid grid-cols-3">
-          <div className="flex flex-col justify-center gap-1 border-t px-4 py-3 first:border-l-0 sm:border-t-0 sm:border-l sm:px-6 sm:py-6">
-            <span className="text-xs text-muted-foreground">
-              Total Solutions
-            </span>
-            <span className="text-lg leading-none font-bold sm:text-2xl">
-              {totals.solutions.toLocaleString()}
-            </span>
-          </div>
+        <CardAction className="flex w-full flex-wrap items-stretch justify-start gap-2 sm:w-auto sm:justify-end">
+          {summaryMetrics.map((metric) => (
+            <Card
+              key={metric.label}
+              size="sm"
+              className="min-w-0 flex-1 gap-1 sm:min-w-28 sm:flex-none shadow-md"
+            >
+              <CardHeader>
+                <CardDescription className="text-xs whitespace-nowrap">
+                  {metric.label}
+                </CardDescription>
 
-          <div className="flex flex-col justify-center gap-1 border-t border-l px-4 py-3 sm:border-t-0 sm:px-6 sm:py-6">
-            <span className="text-xs text-muted-foreground">Categories</span>
-            <span className="text-lg leading-none font-bold sm:text-2xl">
-              {totals.categories.toLocaleString()}
-            </span>
-          </div>
-
-          <div className="flex flex-col justify-center gap-1 border-t border-l px-4 py-3 sm:border-t-0 sm:px-6 sm:py-6">
-            <span className="text-xs text-muted-foreground">
-              Recent Updates
-            </span>
-            <span className="text-lg leading-none font-bold sm:text-2xl">
-              {totals.recent.toLocaleString()}
-            </span>
-          </div>
-        </div>
+                <CardTitle className="text-xl tabular-nums tracking-tight">
+                  {metric.value.toLocaleString()}
+                </CardTitle>
+              </CardHeader>
+            </Card>
+          ))}
+        </CardAction>
       </CardHeader>
 
-      {/* Chart & Category Legend */}
-      <CardContent className="px-4 py-4 sm:p-6">
+      {/* Chart and Legend */}
+      <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
         {chartData.length === 0 ? (
           <div className="flex h-65 items-center justify-center text-sm text-muted-foreground">
             No category data available to display.
@@ -161,7 +171,10 @@ export function CategorySolutionsChart({
 
                   <Tooltip
                     content={<CategoryChartTooltip />}
-                    cursor={{ fill: "hsl(var(--muted) / 0.2)", radius: 4 }}
+                    cursor={{
+                      fill: "hsl(var(--muted) / 0.2)",
+                      radius: 4,
+                    }}
                   />
 
                   <Bar
@@ -184,7 +197,6 @@ export function CategorySolutionsChart({
               </ResponsiveContainer>
             </div>
 
-            {/* Bottom Legend with Shorthand + Color + Full Category Name */}
             <CategoryChartLegend items={chartData} />
           </div>
         )}

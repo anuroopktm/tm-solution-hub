@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from app.api.router import api_router
 from app.chat.checkpointer import close_checkpointer_pool, get_checkpointer
 from app.chat.graph import build_chat_graph
+from app.core.config import settings
 from app.core.cors import register_cors
 from app.core.s3 import ensure_bucket_exists
 
@@ -27,7 +28,7 @@ async def lifespan(app: FastAPI):
 
 # Initialize standalone FastAPI Application with lifespan
 app = FastAPI(
-    title="TM Solution Hub API",
+    title=settings.PROJECT_NAME,
     lifespan=lifespan,
 )
 

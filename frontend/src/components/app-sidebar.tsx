@@ -9,7 +9,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { GalleryVerticalEnd } from "lucide-react";
+import { ConforgeIcon } from "./conforge-logo";
+import { BRAND_CONFIG } from "@/config/brand.config";
 import { NavMain } from "./navigation/nav-main";
 import { NavCategories } from "./navigation/nav-categories";
 import { NavUser } from "./navigation/nav-user";
@@ -22,12 +23,16 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" render={<Link to="/dashboard" />}>
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                <GalleryVerticalEnd className="size-4" />
+                <ConforgeIcon />
               </div>
 
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">ThoughtMinds</span>
-                <span className="truncate text-xs">Solutions Hub</span>
+                <span className="truncate font-semibold">
+                  {BRAND_CONFIG.name}
+                </span>
+                <span className="truncate text-xs">
+                  {BRAND_CONFIG.subtitle}
+                </span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>

@@ -19,7 +19,7 @@ function ScrollArea({
   return (
     <ScrollAreaPrimitive.Root
       data-slot="scroll-area"
-      className={cn("relative overflow-hidden", className)}
+      className={cn("group/scroll-area relative overflow-hidden", className)}
       {...props}
     >
       <ScrollAreaPrimitive.Viewport
@@ -27,7 +27,7 @@ function ScrollArea({
         onScroll={onScroll}
         data-slot="scroll-area-viewport"
         className={cn(
-          "size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1",
+          "size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 scrollbar-none [&::-webkit-scrollbar]:hidden",
           viewportClassName,
         )}
       >
@@ -51,7 +51,7 @@ function ScrollBar({
       data-orientation={orientation}
       orientation={orientation}
       className={cn(
-        "flex touch-none p-0.5 transition-colors select-none",
+        "flex touch-none p-0.5 select-none opacity-0 transition-opacity duration-150 group-hover/scroll-area:opacity-100 data-hovering:opacity-100 data-scrolling:opacity-100",
         orientation === "vertical" &&
           "h-full w-2.5 border-l border-l-transparent",
         orientation === "horizontal" &&

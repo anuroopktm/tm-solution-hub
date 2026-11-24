@@ -37,7 +37,12 @@ export function RecentSolutionsSection({
           </p>
         </div>
 
-        <Button variant="ghost" size="sm" render={<Link to="/categories" />}>
+        <Button
+          variant="ghost"
+          size="sm"
+          nativeButton={false}
+          render={<Link to="/categories" />}
+        >
           View all
           <ArrowRight />
         </Button>

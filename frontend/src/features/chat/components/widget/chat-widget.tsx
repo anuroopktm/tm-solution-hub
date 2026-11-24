@@ -1,6 +1,7 @@
 import { useLocation } from "react-router-dom";
-import { Maximize2, X, Plus, MessageSquare } from "lucide-react";
+import { Maximize2, X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ChatWidgetTrigger } from "./chat-widget-trigger";
 import { ChatMessageList } from "../chat-message-list";
 import { ChatComposer } from "../chat-composer";
 import { useChatContext } from "../../context/chat-context";
@@ -29,18 +30,7 @@ export function ChatWidget() {
     <>
       {/* Floating Action Button (FAB) positioned to match page p-4 padding */}
       {!isWidgetOpen && (
-        <Button
-          type="button"
-          size="icon"
-          onClick={openWidget}
-          className="fixed bottom-4 right-4 z-40 rounded-full shadow-lg"
-          aria-label="Open chat assistant"
-        >
-          <MessageSquare className="size-5" />
-          {isStreaming && (
-            <span className="absolute -top-1 -right-1 size-2.5 rounded-full bg-primary ring-2 ring-background" />
-          )}
-        </Button>
+        <ChatWidgetTrigger onClick={openWidget} isStreaming={isStreaming} />
       )}
 
       {/* Floating Mini Chat Window */}
@@ -51,7 +41,7 @@ export function ChatWidget() {
           className="fixed bottom-4 right-4 z-40 flex h-135 w-96 max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-xl bg-background text-foreground shadow-2xl ring-1 ring-border"
         >
           {/* Header Action Bar: Icons left-aligned with no borders or title */}
-          <div className="flex h-9 shrink-0 items-center justify-start gap-1 px-4 pt-2">
+          <div className="flex h-9 shrink-0 items-center justify-start gap-2.5 px-3 pt-2">
             <Button
               type="button"
               variant="ghost"

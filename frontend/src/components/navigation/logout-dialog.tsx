@@ -11,6 +11,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useLogout } from "@/hooks/use-logout";
+import { BRAND_CONFIG } from "@/config/brand.config";
 import type { AxiosError } from "axios";
 
 interface LogoutDialogProps {
@@ -45,7 +46,7 @@ export function LogoutDialog({ open, onOpenChange }: LogoutDialogProps) {
           <AlertDialogTitle>Confirm Log out</AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to log out of your account? You will need to
-            sign in again to access the Solutions Hub.
+            sign in again to access {BRAND_CONFIG.fullName}.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

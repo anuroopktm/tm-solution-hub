@@ -2,6 +2,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    PROJECT_NAME: str = "Conforge Solutions Hub API"
+    BRAND_NAME: str = "Conforge"
+
     DATABASE_URL: str
     ADMIN_EMAIL: str
 

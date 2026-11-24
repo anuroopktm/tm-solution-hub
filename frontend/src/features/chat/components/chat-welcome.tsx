@@ -48,17 +48,12 @@ export function ChatWelcome({
   return (
     <div
       className={cn(
-        "my-auto flex w-full flex-col items-center justify-center text-center @container",
-        compact ? "max-w-sm p-4 py-2" : "max-w-3xl p-4 sm:p-6",
+        "my-auto flex w-full flex-col items-center text-center @container",
+        compact ? "max-w-sm" : "max-w-2xl",
         className,
       )}
     >
-      <div
-        className={cn(
-          "space-y-1",
-          compact ? "max-w-xs" : "max-w-md space-y-1.5",
-        )}
-      >
+      <div className={cn("space-y-1.5", compact ? "max-w-xs" : "max-w-md")}>
         <h1
           className={cn(
             "font-semibold tracking-tight",
@@ -93,12 +88,7 @@ export function ChatWelcome({
               )}
             >
               <div className="flex items-center gap-2">
-                <Icon
-                  className={cn(
-                    "text-muted-foreground",
-                    compact ? "size-4" : "size-4",
-                  )}
-                />
+                <Icon className="size-4 text-muted-foreground" />
                 <span className="text-xs font-medium sm:text-sm">
                   {item.title}
                 </span>

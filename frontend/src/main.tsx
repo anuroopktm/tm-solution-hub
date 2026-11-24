@@ -7,7 +7,12 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/api/query-client";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import { BRAND_CONFIG } from "@/config/brand.config";
 import App from "./app";
+
+if (typeof document !== "undefined") {
+  document.title = BRAND_CONFIG.pageTitle;
+}
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
