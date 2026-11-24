@@ -2,7 +2,12 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PasswordInput } from "@/components/ui/input-group";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -29,9 +34,49 @@ import type { User } from "@/types/user.types";
 import { UserFormDialog } from "./user-form-dialog";
 import { UserDeleteDialog } from "./user-delete-dialog";
 
-import { Plus, Pencil, RotateCcw, Trash2, UserX } from "lucide-react";
+import {
+  Plus,
+  Pencil,
+  RotateCcw,
+  Trash2,
+  UserX,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 
 import { toast } from "sonner";
+
+function UserPasswordCell({ password }: { password?: string }) {
+  const [show, setShow] = useState(false);
+
+  return (
+    <div className="w-36 sm:w-44">
+      <InputGroup className="font-mono bg-muted/30">
+        <InputGroupInput
+          type={show ? "text" : "password"}
+          value={password || "••••••••••••"}
+          readOnly
+          tabIndex={-1}
+        />
+        <InputGroupAddon align="inline-end">
+          <InputGroupButton
+            type="button"
+            size="icon-xs"
+            onClick={() => setShow((prev) => !prev)}
+            tabIndex={-1}
+            title={show ? "Hide password" : "Show password"}
+            aria-label={show ? "Hide password" : "Show password"}
+          >
+            {show ? <EyeOff /> : <Eye />}
+            <span className="sr-only">
+              {show ? "Hide password" : "Show password"}
+            </span>
+          </InputGroupButton>
+        </InputGroupAddon>
+      </InputGroup>
+    </div>
+  );
+}
 
 export function UsersView() {
   const [search, setSearch] = useState("");
@@ -160,13 +205,7 @@ export function UsersView() {
                   <TableCell>{user.email}</TableCell>
 
                   <TableCell>
-                    <div className="w-36 sm:w-44">
-                      <PasswordInput
-                        value={user.password || "••••••••••••"}
-                        readOnly
-                        className="font-mono bg-muted/30"
-                      />
-                    </div>
+                    <UserPasswordCell password={user.password} />
                   </TableCell>
 
                   <TableCell>

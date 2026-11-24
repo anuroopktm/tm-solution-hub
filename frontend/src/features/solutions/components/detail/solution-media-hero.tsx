@@ -1,20 +1,18 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { getMediaType } from "@/utils/media";
 import { SolutionCardFallback } from "../solution-card-fallback";
-import {
-  FilePreviewDialog,
-  type FilePreviewItem,
-} from "@/components/ui/file-preview-dialog";
+import { SolutionFullscreenViewer } from "../assets/fullscreen-viewer";
 import { Maximize2 } from "lucide-react";
 import type { Solution } from "@/types/solution.types";
+import type { SolutionAsset } from "@/types/solution-asset.types";
 
 interface SolutionMediaHeroProps {
   solution: Solution;
 }
 
 export function SolutionMediaHero({ solution }: SolutionMediaHeroProps) {
-  const [previewFile, setPreviewFile] = useState<FilePreviewItem | null>(null);
+  const [viewerOpen, setViewerOpen] = useState<boolean>(false);
 
   const thumbnailUrl =
     solution.thumbnail_url || solution.videos?.[0]?.thumbnail_url;
@@ -22,10 +20,51 @@ export function SolutionMediaHero({ solution }: SolutionMediaHeroProps) {
 
   const mediaType = getMediaType(previewUrl);
 
+  const heroAssets = useMemo<SolutionAsset[]>(() => {
+    const list: SolutionAsset[] = [];
+    if (previewUrl) {
+      list.push({
+        id: "hero-preview",
+        name: `${solution.title} Preview`,
+        type: mediaType === "video" ? "video" : "image",
+        format: mediaType === "video" ? "MP4" : "IMAGE",
+        file_url: previewUrl,
+        thumbnail_url: thumbnailUrl || undefined,
+        description: solution.description,
+      });
+    } else if (thumbnailUrl) {
+      list.push({
+        id: "hero-thumbnail",
+        name: `${solution.title} Thumbnail`,
+        type: "image",
+        format: "IMAGE",
+        file_url: thumbnailUrl,
+        description: solution.description,
+      });
+    }
+
+    // Include other solution videos if present
+    solution.videos?.forEach((v, idx) => {
+      if (v.video_url && v.video_url !== previewUrl) {
+        list.push({
+          id: v.id || `video-${idx}`,
+          name: v.title || `Video ${idx + 1}`,
+          type: "video",
+          format: "MP4",
+          file_url: v.video_url,
+          thumbnail_url: v.thumbnail_url || undefined,
+          duration_seconds: v.duration_seconds,
+        });
+      }
+    });
+
+    return list;
+  }, [previewUrl, thumbnailUrl, solution, mediaType]);
+
   return (
     <>
       <Card className="overflow-hidden border-border/70 bg-card p-0 shadow-xs">
-        <div className="relative aspect-[21/9] sm:aspect-[2.4/1] w-full overflow-hidden bg-muted/50">
+        <div className="relative aspect-21/9 sm:aspect-2.5/1 max-h-80 w-full overflow-hidden bg-muted/50">
           {mediaType === "video" && previewUrl ? (
             <video
               src={previewUrl}
@@ -38,30 +77,16 @@ export function SolutionMediaHero({ solution }: SolutionMediaHeroProps) {
           ) : thumbnailUrl ? (
             <div
               className="group/hero relative h-full w-full cursor-pointer"
-              onClick={() =>
-                setPreviewFile({
-                  name: solution.title,
-                  url: thumbnailUrl,
-                  format: "IMAGE",
-                  description: "Full-page resolution preview",
-                  isImage: true,
-                })
-              }
+              onClick={() => setViewerOpen(true)}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
-                  setPreviewFile({
-                    name: solution.title,
-                    url: thumbnailUrl,
-                    format: "IMAGE",
-                    description: "Full-page resolution preview",
-                    isImage: true,
-                  });
+                  setViewerOpen(true);
                 }
               }}
-              title="Click to view full image"
+              title="Click to view full preview"
             >
               <img
                 src={thumbnailUrl}
@@ -79,10 +104,11 @@ export function SolutionMediaHero({ solution }: SolutionMediaHeroProps) {
         </div>
       </Card>
 
-      <FilePreviewDialog
-        open={Boolean(previewFile)}
-        onOpenChange={(open) => !open && setPreviewFile(null)}
-        file={previewFile}
+      <SolutionFullscreenViewer
+        open={viewerOpen}
+        onOpenChange={setViewerOpen}
+        assets={heroAssets}
+        initialIndex={0}
       />
     </>
   );

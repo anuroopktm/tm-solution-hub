@@ -4,6 +4,8 @@
 @import "@fontsource-variable/geist";
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant data-vertical (&[data-orientation="vertical"]);
+@custom-variant data-horizontal (&[data-orientation="horizontal"]);
 
 @theme inline {
   --font-sans:

@@ -1,6 +1,5 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { Eye, EyeOff } from "lucide-react";
 import { cn } from "cn";
 
 import { Button } from "@/components/ui/button";
@@ -147,57 +146,6 @@ function InputGroupTextarea({
   );
 }
 
-export interface PasswordInputProps extends React.ComponentProps<typeof Input> {
-  showPassword?: boolean;
-  onTogglePassword?: () => void;
-}
-
-function PasswordInput({
-  className,
-  showPassword: controlledShow,
-  onTogglePassword,
-  disabled,
-  ...props
-}: PasswordInputProps) {
-  const [internalShow, setInternalShow] = React.useState(false);
-  const isControlled = controlledShow !== undefined;
-  const show = isControlled ? controlledShow : internalShow;
-
-  const handleToggle = () => {
-    if (onTogglePassword) {
-      onTogglePassword();
-    } else {
-      setInternalShow((prev) => !prev);
-    }
-  };
-
-  return (
-    <InputGroup className={className}>
-      <InputGroupInput
-        type={show ? "text" : "password"}
-        disabled={disabled}
-        {...props}
-      />
-      <InputGroupAddon align="inline-end">
-        <InputGroupButton
-          type="button"
-          size="icon-xs"
-          onClick={handleToggle}
-          disabled={disabled}
-          tabIndex={-1}
-          title={show ? "Hide password" : "Show password"}
-          aria-label={show ? "Hide password" : "Show password"}
-        >
-          {show ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-          <span className="sr-only">
-            {show ? "Hide password" : "Show password"}
-          </span>
-        </InputGroupButton>
-      </InputGroupAddon>
-    </InputGroup>
-  );
-}
-
 export {
   InputGroup,
   InputGroupAddon,
@@ -205,5 +153,4 @@ export {
   InputGroupText,
   InputGroupInput,
   InputGroupTextarea,
-  PasswordInput,
 };

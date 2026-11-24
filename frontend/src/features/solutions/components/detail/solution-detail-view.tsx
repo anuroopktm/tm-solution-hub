@@ -146,6 +146,7 @@ export function SolutionDetailView({
                 <Button
                   variant="default"
                   size="sm"
+                  nativeButton={false}
                   render={
                     <a
                       href={solution.preview_url}
@@ -165,6 +166,7 @@ export function SolutionDetailView({
                 <Button
                   variant="outline"
                   size="sm"
+                  nativeButton={false}
                   render={
                     <a
                       href={solution.repository_url}

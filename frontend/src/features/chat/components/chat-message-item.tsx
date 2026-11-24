@@ -56,13 +56,17 @@ export function ChatMessageItem({
   }
 
   return (
-    <Message align="start">
-      <MessageContent>
-        <Bubble variant="ghost" align="start" className="w-full max-w-full">
-          <BubbleContent className="w-full rounded-xl p-0 shadow-none">
+    <Message align="start" className="w-full max-w-full">
+      <MessageContent className="w-full max-w-full">
+        <Bubble
+          variant="ghost"
+          align="start"
+          className="w-full max-w-none! sm:max-w-none!"
+        >
+          <BubbleContent className="w-full max-w-none! rounded-xl p-0 shadow-none">
             <div
               className={cn(
-                "w-full",
+                "w-full min-w-0",
                 compact ? "space-y-2.5 text-sm" : "space-y-3 text-sm",
               )}
             >
@@ -81,7 +85,7 @@ export function ChatMessageItem({
               )}
 
               {/* Markdown content */}
-              <div>
+              <div className="w-full min-w-0">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={{
@@ -116,8 +120,8 @@ export function ChatMessageItem({
                       return (
                         <div
                           className={cn(
-                            "overflow-x-auto rounded-xl border",
-                            compact ? "my-2 text-xs" : "my-3 text-sm",
+                            "my-2.5 w-full overflow-x-auto rounded-xl border border-border",
+                            compact ? "text-xs" : "text-sm",
                           )}
                         >
                           <table
@@ -129,11 +133,41 @@ export function ChatMessageItem({
                         </div>
                       );
                     },
+                    thead({ children, ...props }: ComponentProps<"thead">) {
+                      return (
+                        <thead
+                          className="border-b border-border bg-muted/60"
+                          {...props}
+                        >
+                          {children}
+                        </thead>
+                      );
+                    },
+                    tbody({ children, ...props }: ComponentProps<"tbody">) {
+                      return (
+                        <tbody
+                          className="[&_tr:last-child_td]:border-b-0"
+                          {...props}
+                        >
+                          {children}
+                        </tbody>
+                      );
+                    },
+                    tr({ children, ...props }: ComponentProps<"tr">) {
+                      return (
+                        <tr
+                          className="border-b border-border/60 transition-colors hover:bg-muted/30"
+                          {...props}
+                        >
+                          {children}
+                        </tr>
+                      );
+                    },
                     th({ children, ...props }: ComponentProps<"th">) {
                       return (
                         <th
                           className={cn(
-                            "border-b bg-muted font-medium",
+                            "border-b border-border bg-muted/60 font-semibold text-foreground",
                             compact ? "px-2.5 py-1.5" : "px-3 py-2",
                           )}
                           {...props}
@@ -146,7 +180,7 @@ export function ChatMessageItem({
                       return (
                         <td
                           className={cn(
-                            "border-b text-muted-foreground last:border-none",
+                            "border-b border-border/60 text-muted-foreground",
                             compact ? "px-2.5 py-1.5" : "px-3 py-2",
                           )}
                           {...props}

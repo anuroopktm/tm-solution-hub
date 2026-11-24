@@ -10,6 +10,7 @@ export {
   SolutionAssetList,
   SolutionAssetItem,
   SolutionAssetPreviewDialog,
+  SolutionFullscreenViewer,
   AssetPreview,
 } from "./components/assets";
 export {

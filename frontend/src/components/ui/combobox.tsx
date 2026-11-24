@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 import { Combobox as ComboboxPrimitive } from "@base-ui/react";
 import { cn } from "cn";
@@ -252,12 +250,9 @@ function ComboboxChip({
       {children}
       {showRemove && (
         <ComboboxPrimitive.ChipRemove
-          render={
-            <Button variant="ghost" size="icon-xs" aria-label="Remove item" />
-          }
+          render={<Button variant="ghost" size="icon-xs" />}
           className="-ml-1 opacity-50 hover:opacity-100"
           data-slot="combobox-chip-remove"
-          aria-label="Remove item"
         >
           <XIcon className="pointer-events-none" />
         </ComboboxPrimitive.ChipRemove>

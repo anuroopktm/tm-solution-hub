@@ -2,6 +2,7 @@ export * from "./solution-assets-card";
 export * from "./solution-asset-list";
 export * from "./solution-asset-item";
 export * from "./solution-asset-preview-dialog";
+export * from "./fullscreen-viewer";
 export * from "./viewers/asset-preview";
 export * from "./viewers/image-viewer";
 export * from "./viewers/pdf-viewer";

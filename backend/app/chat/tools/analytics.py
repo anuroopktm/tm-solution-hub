@@ -8,7 +8,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import selectinload
 
 from app.core.database import SessionLocal
-from app.chat.tools.formatters import format_solution_detail
+from app.chat.tools.formatters import format_solution_summary
 from app.models.category import Category
 from app.models.solution import Solution
 from app.services import solutions as solution_service
@@ -16,12 +16,12 @@ from app.services import solutions as solution_service
 
 @tool
 def compare_solutions(solution_identifiers: list[str]) -> dict[str, Any]:
-    """Compare two or more solutions side-by-side.
+    """Compare two or three solutions side-by-side.
 
     Analyzes differences and commonalities across tech stack, capabilities, and repository links.
 
     Args:
-        solution_identifiers: List of solution titles or UUID strings.
+        solution_identifiers: List of 2 to 3 solution titles or UUID strings.
 
     Returns:
         Structured side-by-side comparison including shared and distinct technologies.
@@ -32,11 +32,14 @@ def compare_solutions(solution_identifiers: list[str]) -> dict[str, Any]:
             "compared_count": len(solution_identifiers),
         }
 
+    # Restrict to at most 3 to keep prompt size compact
+    safe_identifiers = solution_identifiers[:3]
+
     with SessionLocal() as db:
         detailed_solutions: list[Solution] = []
         missing: list[str] = []
 
-        for ident in solution_identifiers:
+        for ident in safe_identifiers:
             s = solution_service.get_solution_detail_by_code_or_id(db, ident.strip())
             if s:
                 detailed_solutions.append(s)
@@ -73,7 +76,7 @@ def compare_solutions(solution_identifiers: list[str]) -> dict[str, Any]:
                 "shared_technologies": shared_tech,
                 "all_unique_technologies": all_tech,
             },
-            "solutions": [format_solution_detail(s) for s in detailed_solutions],
+            "solutions": [format_solution_summary(s) for s in detailed_solutions],
         }
 
 
@@ -98,7 +101,7 @@ def get_hub_metrics() -> dict[str, Any]:
 
         top_tech_stack: list[dict[str, Any]] = [
             {"technology": tech, "count": count}
-            for tech, count in tech_counter.most_common(10)
+            for tech, count in tech_counter.most_common(6)
         ]
 
         # Category breakdown

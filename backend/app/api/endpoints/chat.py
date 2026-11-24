@@ -29,6 +29,48 @@ def _format_sse(event: str, data: dict[str, object] | str) -> str:
     return f"event: {event}\ndata: {payload_str}\n\n"
 
 
+def _format_tool_result_summary(tool_name: str, output: Any) -> str:
+    """Format a clean, human-readable summary for client UI instead of raw JSON dumps."""
+    data = output
+    if isinstance(output, str):
+        try:
+            data = json.loads(output)
+        except Exception:
+            data = output
+
+    if isinstance(data, dict):
+        if tool_name == "get_solution_details":
+            sol = data.get("solution", {})
+            title = sol.get("title", "") if isinstance(sol, dict) else ""
+            if title:
+                return f"Retrieved details for '{title}'"
+            return "Retrieved solution details"
+        elif tool_name == "search_solutions":
+            count = data.get("total_matches", len(data.get("solutions", [])))
+            return f"Found {count} matching solution(s)"
+        elif tool_name == "list_recent_solutions":
+            count = data.get("count", len(data.get("solutions", [])))
+            return f"Retrieved {count} recent solution(s)"
+        elif tool_name == "filter_solutions_by_tech":
+            count = data.get("total_matches", len(data.get("solutions", [])))
+            return f"Found {count} solution(s) matching tech criteria"
+        elif tool_name == "list_categories":
+            count = data.get("total_categories", len(data.get("categories", [])))
+            return f"Retrieved {count} category/domain(s)"
+        elif tool_name == "get_solutions_by_category":
+            cat = data.get("category", {}).get("name", "category")
+            count = len(data.get("solutions", []))
+            return f"Retrieved {count} solution(s) in '{cat}'"
+        elif tool_name == "compare_solutions":
+            count = data.get("compared_count", len(data.get("solutions", [])))
+            return f"Compared {count} solutions"
+        elif tool_name == "get_hub_metrics":
+            total = data.get("total_solutions", 0)
+            return f"Retrieved hub metrics ({total} total solutions)"
+
+    return f"Completed {tool_name}"
+
+
 @router.post("/stream")
 async def chat_stream(
     payload: ChatStreamRequest,
@@ -120,6 +162,12 @@ async def chat_stream(
                 # Streaming token chunks from LLM
                 if kind == "on_chat_model_stream":
                     chunk = event_dict.get("data", {}).get("chunk")
+                    # Ignore tool call chunks so tool JSON is not streamed as user-facing content
+                    if getattr(chunk, "tool_call_chunks", None) or getattr(
+                        chunk, "tool_calls", None
+                    ):
+                        continue
+
                     chunk_content = getattr(chunk, "content", None)
                     if isinstance(chunk_content, str) and chunk_content:
                         full_response += chunk_content
@@ -127,6 +175,8 @@ async def chat_stream(
 
                 # Streaming tool call triggers
                 elif kind == "on_tool_start":
+                    # Tool execution begins: clear any intermediate preamble collected before tools
+                    full_response = ""
                     tool_name = event_dict.get("name", "")
                     tool_input = event_dict.get("data", {}).get("input")
                     run_id = event_dict.get("run_id", "")
@@ -145,12 +195,13 @@ async def chat_stream(
                     tool_output = event_dict.get("data", {}).get("output")
                     run_id = event_dict.get("run_id", "")
                     output_content = getattr(tool_output, "content", tool_output)
+                    summary = _format_tool_result_summary(tool_name, output_content)
                     yield _format_sse(
                         "tool_result",
                         {
                             "tool_id": str(run_id),
                             "name": tool_name,
-                            "result": output_content,
+                            "result": summary,
                         },
                     )
 
@@ -166,7 +217,7 @@ async def chat_stream(
                     db=save_db,
                     conversation_id=conv_id,
                     role="assistant",
-                    content=full_response,
+                    content=full_response.strip(),
                 )
             except Exception as exc:
                 logger.error("Failed to save assistant message to DB: %s", exc)
@@ -174,7 +225,7 @@ async def chat_stream(
                 save_db.close()
 
         # Emit terminal done event
-        yield _format_sse("done", {"full_response": full_response})
+        yield _format_sse("done", {"full_response": full_response.strip()})
 
     headers = {
         "Cache-Control": "no-cache",

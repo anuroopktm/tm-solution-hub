@@ -127,6 +127,7 @@ export function useChat(initialConversationId?: string | null) {
                   };
                   return {
                     ...m,
+                    content: "", // Clear any accidental pre-tool artifacts
                     toolCalls: [...(m.toolCalls || []), newTool],
                   };
                 }),

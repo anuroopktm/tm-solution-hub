@@ -15,6 +15,51 @@ export interface TraceStepProps extends ComponentProps<"div"> {
   defaultExpanded?: boolean;
 }
 
+function formatTraceDetails(details: unknown): string {
+  if (typeof details === "string") {
+    const trimmed = details.trim();
+    if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (typeof parsed === "object" && parsed !== null) {
+          if (
+            "solution" in parsed &&
+            typeof parsed.solution === "object" &&
+            parsed.solution
+          ) {
+            const sol = parsed.solution as Record<string, unknown>;
+            return `Retrieved details for '${sol.title || "solution"}'`;
+          }
+          if ("total_matches" in parsed) {
+            return `Found ${parsed.total_matches} matching solution(s)`;
+          }
+          if ("count" in parsed) {
+            return `Found ${parsed.count} item(s)`;
+          }
+          if ("message" in parsed && typeof parsed.message === "string") {
+            return parsed.message;
+          }
+          return JSON.stringify(parsed, null, 2);
+        }
+      } catch {
+        // Fallback to string
+      }
+    }
+    return details;
+  }
+  if (typeof details === "object" && details !== null) {
+    const obj = details as Record<string, unknown>;
+    if ("identifier" in obj) {
+      return `Target: ${obj.identifier}`;
+    }
+    if ("query" in obj && obj.query) {
+      return `Query: "${obj.query}"`;
+    }
+    return JSON.stringify(details, null, 2);
+  }
+  return String(details);
+}
+
 export function TraceStep({
   title,
   status = "completed",
@@ -65,11 +110,9 @@ export function TraceStep({
 
       {isExpanded && hasDetails && (
         <div className="border-t bg-muted/50 px-3 py-2 font-mono text-xs leading-relaxed text-muted-foreground">
-          <pre className="overflow-x-auto whitespace-pre-wrap break-all">
-            {typeof details === "string"
-              ? details
-              : JSON.stringify(details, null, 2)}
-          </pre>
+          <p className="overflow-x-auto whitespace-pre-wrap break-all">
+            {formatTraceDetails(details)}
+          </p>
         </div>
       )}
     </div>

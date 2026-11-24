@@ -92,6 +92,7 @@ export function ChatMessageList({
                 key={message.id}
                 messageId={message.id}
                 scrollAnchor={message.role === "user"}
+                className="w-full"
               >
                 <ChatMessageItem compact={compact} message={message} />
               </MessageScrollerItem>

@@ -17,7 +17,7 @@ def list_categories() -> dict[str, Any]:
     """List all solution categories/domains in TM Solution Hub along with solution counts.
 
     Returns:
-        List of categories with name, description, and number of solutions.
+        List of categories with name, brief description, and number of solutions.
     """
     with SessionLocal() as db:
         categories = (
@@ -33,7 +33,11 @@ def list_categories() -> dict[str, Any]:
                 {
                     "id": str(c.id),
                     "name": c.name,
-                    "description": c.description,
+                    "description": (
+                        (c.description[:80] + "...")
+                        if c.description and len(c.description) > 80
+                        else (c.description or "")
+                    ),
                     "solutions_count": len(c.solution_associations),
                 }
                 for c in categories
@@ -42,16 +46,20 @@ def list_categories() -> dict[str, Any]:
 
 
 @tool
-def get_solutions_by_category(category_name_or_id: str) -> dict[str, Any]:
-    """Retrieve all solutions categorized under a specific business or technical domain.
+def get_solutions_by_category(
+    category_name_or_id: str, limit: int = 5
+) -> dict[str, Any]:
+    """Retrieve solutions categorized under a specific business or technical domain.
 
     Args:
         category_name_or_id: The category name (e.g. 'Artificial Intelligence', 'Finance and Accounting')
                              or UUID of the category.
+        limit: Maximum number of solutions to return (default 5, max 5).
 
     Returns:
-        Category metadata and the list of solutions belonging to it.
+        Category metadata and concise list of solutions belonging to it.
     """
+    safe_limit = max(1, min(limit, 5))
     with SessionLocal() as db:
         category = None
         try:
@@ -82,12 +90,13 @@ def get_solutions_by_category(category_name_or_id: str) -> dict[str, Any]:
                 "solutions": [],
             }
 
-        # Query all solutions for this category
+        # Query solutions for this category with limit
         solution_ids = [assoc.solution_id for assoc in category.solution_associations]
         solutions: list[Solution] = (
             db.query(Solution)
             .filter(Solution.id.in_(solution_ids))
             .order_by(Solution.title.asc())
+            .limit(safe_limit)
             .all()
             if solution_ids
             else []
@@ -98,8 +107,7 @@ def get_solutions_by_category(category_name_or_id: str) -> dict[str, Any]:
             "category": {
                 "id": str(category.id),
                 "name": category.name,
-                "description": category.description,
             },
-            "total_solutions": len(solutions),
+            "total_solutions": len(category.solution_associations),
             "solutions": [format_solution_summary(s) for s in solutions],
         }

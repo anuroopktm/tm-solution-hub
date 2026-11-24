@@ -1,4 +1,3 @@
-import * as React from "react";
 import type { SolutionAsset } from "@/types/solution-asset.types";
 import type { SolutionDocument, SolutionVideo } from "@/types/solution.types";
 import { normalizeSolutionAssets } from "@/utils/asset-utils";
@@ -12,8 +11,9 @@ import {
 } from "@/components/ui/card";
 import { FolderGit2 } from "lucide-react";
 import { SolutionAssetList } from "./solution-asset-list";
-import { SolutionAssetPreviewDialog } from "./solution-asset-preview-dialog";
+import { SolutionFullscreenViewer } from "./fullscreen-viewer";
 import { Badge } from "@/components/ui/badge";
+import { useCallback, useMemo, useState } from "react";
 
 export interface SolutionAssetsCardProps {
   assets?: SolutionAsset[];
@@ -34,14 +34,22 @@ export function SolutionAssetsCard({
   description = "Documents, diagrams, specifications, and demo videos.",
   className,
 }: SolutionAssetsCardProps) {
-  const [previewAsset, setPreviewAsset] = React.useState<SolutionAsset | null>(
-    null,
-  );
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
 
-  const assets = React.useMemo(() => {
+  const assets = useMemo(() => {
     if (propAssets?.length) return propAssets;
     return normalizeSolutionAssets(documents, videos);
   }, [propAssets, documents, videos]);
+
+  const handlePreview = useCallback(
+    (asset: SolutionAsset) => {
+      const index = assets.findIndex(
+        (a) => a.id === asset.id || a.file_url === asset.file_url,
+      );
+      setPreviewIndex(index >= 0 ? index : 0);
+    },
+    [assets],
+  );
 
   if (!assets.length) return null;
 
@@ -66,17 +74,18 @@ export function SolutionAssetsCard({
           <SolutionAssetList
             assets={assets}
             layout={layout}
-            onPreview={setPreviewAsset}
+            onPreview={handlePreview}
           />
         </CardContent>
       </Card>
 
-      <SolutionAssetPreviewDialog
-        open={Boolean(previewAsset)}
+      <SolutionFullscreenViewer
+        open={previewIndex !== null}
         onOpenChange={(open) => {
-          if (!open) setPreviewAsset(null);
+          if (!open) setPreviewIndex(null);
         }}
-        asset={previewAsset}
+        assets={assets}
+        initialIndex={previewIndex ?? 0}
       />
     </>
   );

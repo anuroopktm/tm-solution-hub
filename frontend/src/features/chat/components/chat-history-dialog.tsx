@@ -73,7 +73,7 @@ export function ChatHistoryDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-xl">
+        <DialogContent className="max-w-xl!">
           <DialogHeader>
             <DialogTitle>Chat history</DialogTitle>
           </DialogHeader>

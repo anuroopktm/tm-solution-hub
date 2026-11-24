@@ -86,7 +86,7 @@ function AttachmentContent({
     <div
       data-slot="attachment-content"
       className={cn(
-        "max-w-full min-w-0 flex-1 leading-tight group-data-[orientation=vertical]/attachment:px-1",
+        "max-w-full min-w-0 flex-1 leading-tight group-data-vertical/attachment:px-1",
         className,
       )}
       {...props}
@@ -135,7 +135,7 @@ function AttachmentActions({
     <div
       data-slot="attachment-actions"
       className={cn(
-        "relative z-20 flex shrink-0 items-center group-data-[orientation=vertical]/attachment:absolute group-data-[orientation=vertical]/attachment:top-3 group-data-[orientation=vertical]/attachment:right-3 group-data-[orientation=vertical]/attachment:gap-1",
+        "relative z-20 flex shrink-0 items-center group-data-vertical/attachment:absolute group-data-vertical/attachment:top-3 group-data-vertical/attachment:right-3 group-data-vertical/attachment:gap-1",
         className,
       )}
       {...props}
