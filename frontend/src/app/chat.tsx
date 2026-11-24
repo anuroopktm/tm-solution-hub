@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { ChatPage as ChatWorkspace } from "@/features/chat/components/chat-page";
+import { ChatPage as ChatWorkspace } from "@/features/chat";
 
 export default function ChatPage() {
   const { conversationId } = useParams();

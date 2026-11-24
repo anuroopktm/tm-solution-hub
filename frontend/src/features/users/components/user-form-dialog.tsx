@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/input-group";
 import { Label } from "@/components/ui/label";
 import { Field, FieldError } from "@/components/ui/field";
-import { useUserForm } from "@/features/users/hooks/use-user-form";
+import { useUserForm } from "../hooks/use-user-form";
 import type { User } from "@/types/user.types";
 import { BRAND_CONFIG } from "@/config/brand.config";
 import { Loader2 } from "lucide-react";

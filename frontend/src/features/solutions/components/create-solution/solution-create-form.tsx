@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useSolutionForm } from "@/features/solutions/hooks/use-solution-form";
-import type { UseSolutionFormReturn } from "@/features/solutions/hooks/use-solution-form";
+import { useSolutionForm } from "../../hooks/use-solution-form";
+import type { UseSolutionFormReturn } from "../../hooks/use-solution-form";
 import { Stepper } from "@/components/ui/stepper";
-import { FORM_STEPS } from "@/features/solutions/constants/form-steps";
+import { FORM_STEPS } from "../../constants/form-steps";
 import { SolutionFormHeader } from "./solution-form-header";
 import {
   SolutionFormValidationAlert,

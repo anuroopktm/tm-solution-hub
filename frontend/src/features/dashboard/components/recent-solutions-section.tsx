@@ -11,7 +11,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { SolutionCard } from "@/features/solutions/components/solution-card";
+import { SolutionCard } from "@/features/solutions";
 import type { Solution } from "@/types/solution.types";
 
 export interface RecentSolutionsSectionProps {

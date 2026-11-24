@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { MultiSelectCombobox } from "@/components/ui/multi-select-combobox";
-import { SUGGESTED_TECH } from "@/features/solutions/constants/suggested-tech";
+import { SUGGESTED_TECH } from "../../constants/suggested-tech";
 import type { SolutionCreateFormValues } from "@/schemas/solution.schema";
 
 export interface StepTechCapabilitiesProps {

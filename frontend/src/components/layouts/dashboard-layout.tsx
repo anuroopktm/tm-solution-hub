@@ -9,8 +9,7 @@ import {
 } from "@/components/navigation/global-breadcrumbs";
 import { RouteLoading } from "@/routes/route-loading";
 import { ContentErrorBoundary } from "@/components/common/content-error-boundary";
-import { ChatProvider } from "@/features/chat/context/chat-context";
-import { ChatWidget } from "@/features/chat/components/widget/chat-widget";
+import { ChatProvider, ChatWidget } from "@/features/chat";
 
 export function DashboardLayout() {
   const matches = useMatches();

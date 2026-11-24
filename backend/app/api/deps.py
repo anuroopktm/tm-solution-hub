@@ -25,8 +25,6 @@ def get_current_user(
 
         subject = payload.get("sub")
 
-        print("subjectsubject", subject)
-
         if not isinstance(subject, str):
             raise ValueError("Missing or invalid subject")
 

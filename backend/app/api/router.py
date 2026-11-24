@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter
 
-from app.endpoints import (
+from app.api.endpoints import (
     auth,
     categories,
     chat,

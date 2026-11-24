@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { getMediaType } from "@/utils/media";
-import { SolutionCardFallback } from "@/features/solutions/components/solution-card-fallback";
+import { SolutionCardFallback } from "../solution-card-fallback";
 import {
   FilePreviewDialog,
   type FilePreviewItem,

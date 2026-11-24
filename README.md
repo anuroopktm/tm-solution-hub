@@ -7,6 +7,7 @@ A full-stack, enterprise solution accelerator portal designed for discovering, e
 ## Documentation
 
 * **[BRANDING.md](BRANDING.md)**: Complete guide on the branding architecture, environment variables, asset locations, and instructions for customizing brand name, logo, favicon, and colors.
+* **[PLAYWRIGHT.md](PLAYWRIGHT.md)**: Comprehensive guide for running, watching (headed & UI modes), debugging, and writing Playwright E2E browser tests.
 
 ---
 

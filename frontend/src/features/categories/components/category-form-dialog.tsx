@@ -12,10 +12,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Field, FieldError } from "@/components/ui/field";
 
-import { useCategoryForm } from "@/features/categories/hooks/use-category-form";
+import { useCategoryForm } from "../hooks/use-category-form";
 import { CategoryIcon } from "@/constants/category-icons";
 import type { Category } from "@/types/category.types";
-import type { CategoryFormDialogProps } from "@/features/categories/types";
+import type { CategoryFormDialogProps } from "../types";
 
 import {
   Select,

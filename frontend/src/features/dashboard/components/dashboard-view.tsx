@@ -2,8 +2,8 @@ import { useNavigate } from "react-router-dom";
 
 import { useDashboardStats } from "@/hooks/use-dashboard";
 import { useRecentSolutions } from "@/hooks/use-solutions";
-import { CategorySolutionsChart } from "@/features/dashboard/components/category-solutions-chart";
-import { RecentSolutionsSection } from "@/features/dashboard/components/recent-solutions-section";
+import { CategorySolutionsChart } from "./category-solutions-chart";
+import { RecentSolutionsSection } from "./recent-solutions-section";
 
 export function DashboardView() {
   const navigate = useNavigate();
